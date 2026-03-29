@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KG Master v6 - Aylık Takip</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        
+        :root {
+            --kg-sari: #ffcc00; --kg-lacivert: #0f172a; --arka: #f1f5f9;
+            --yazi: #1e293b; --yesil: #10b981; --kirmizi: #ef4444;
+        }
+
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: #eef2f6; color: var(--yazi); padding-bottom: 100px; }
+
+        .header { 
+            background: var(--kg-lacivert); color: var(--kg-sari); padding: 20px; 
+            text-align: center; font-weight: 800; border-bottom: 4px solid var(--kg-sari);
+            position: sticky; top: 0; z-index: 1001;
+        }
+
+        .container { padding: 15px; max-width: 480px; margin: auto; }
+
+        .card { 
+            background: white; border-radius: 24px; padding: 20px; 
+            margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; 
+        }
+
+        /* Aylık Başlık Stili */
+        .month-group-header {
+            background: var(--kg-lacivert); color: white;
+            padding: 12px 20px; border-radius: 15px; margin: 25px 0 15px 0;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 800; font-size: 14px; box-shadow: 0 4px 10px rgba(15,23,42,0.2);
+        }
+        .month-total-badge { background: var(--kg-sari); color: var(--kg-lacivert); padding: 4px 10px; border-radius: 8px; font-size: 12px; }
+
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; margin-left: 5px; }
+        input { 
+            width: 100%; padding: 14px; border-radius: 15px; border: 1.5px solid #cbd5e1; 
+            font-size: 16px; font-weight: 700; background: #fff;
+        }
+        input:focus { outline: none; border-color: var(--kg-sari); }
+
+        .row { display: flex; gap: 10px; } .row div { flex: 1; }
+
+        /* Günlük Küçük Kartlar */
+        .day-card {
+            background: white; border-radius: 18px; padding: 15px; margin-bottom: 8px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            border: 1px solid #e2e8f0; transition: 0.2s;
+        }
+        .day-card:active { background: #f8fafc; }
+        .day-header { grid-column: span 3; display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #64748b; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
+        .stat { text-align: center; }
+        .stat b { font-size: 16px; display: block; color: var(--kg-lacivert); }
+        .stat span { font-size: 9px; color: #94a3b8; font-weight: 700; }
+
+        /* Cüzdan */
+        .wallet-card { text-align: center; padding: 20px; border-radius: 20px; color: white; margin-bottom: 10px; }
+
+        .btn { 
+            width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer;
+        }
+        .btn-save { background: var(--kg-lacivert); color: var(--kg-sari); font-size: 16px; }
+
+        .nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; border-top: 1px solid #e2e8f0; z-index: 1002; }
+        .nav-item { flex: 1; text-align: center; font-size: 10px; font-weight: 800; color: #94a3b8; }
+        .nav-item.active { color: var(--kg-lacivert); }
+        .nav-item b { font-size: 20px; display: block; }
+
+        .page { display: none; } .page.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="header">KG MASTER v6</div>
+
+<div class="container">
+    
+    <div id="p-kayit" class="page active">
+        <div class="card">
+            <label>TARİH</label>
+            <input type="date" id="f-tarih" class="input-group">
+            
+            <div class="row">
+                <div class="input-group"><label>GÖREV</label><input type="number" id="f-gorev" inputmode="numeric"></div>
+                <div class="input-group"><label>PARÇA</label><input type="number" id="f-parca" inputmode="numeric"></div>
+            </div>
+            <div class="row">
+                <div class="input-group"><label>DEVİR</label><input type="number" id="f-devir" inputmode="numeric"></div>
+                <div class="input-group"><label>TOPLAMA</label><input type="number" id="f-toplama" inputmode="numeric"></div>
+            </div>
+            <div class="row">
+                <div class="input-group"><label>KM</label><input type="number" id="f-km" inputmode="numeric"></div>
+                <div class="input-group"><label>GİDER (TL)</label><input type="number" id="f-gider" value="0" inputmode="decimal"></div>
+            </div>
+            <button class="btn btn-save" onclick="veriKaydet()">VERİYİ SİSTEME EKLE</button>
+        </div>
+    </div>
+
+    <div id="p-liste" class="page">
+        <div id="listeArea"></div>
+    </div>
+
+    <div id="p-finans" class="page">
+        <div class="wallet-card" style="background: #10b981;">
+            <span style="font-size:12px; font-weight:700;">TOPLAM GELİR</span>
+            <span style="font-size:32px; font-weight:800; display:block;" id="total-kazanc">0 ₺</span>
+        </div>
+        <div class="wallet-card" style="background: #ef4444;">
+            <span style="font-size:12px; font-weight:700;">TOPLAM GİDER</span>
+            <span style="font-size:32px; font-weight:800; display:block;" id="total-gider">0 ₺</span>
+        </div>
+        <button class="btn" style="background:white; border:1px solid #ddd; margin-bottom:10px;" onclick="yedekle()">📥 VERİLERİ YEDEKLE (JSON)</button>
+        <button class="btn" style="background:var(--kg-lacivert); color:var(--kg-sari);" onclick="excelIndir()">📗 EXCEL'E AKTAR</button>
+    </div>
+
+</div>
+
+<div class="nav">
+    <div class="nav-item active" onclick="go('kayit', this)"><b>📝</b>GİRİŞ</div>
+    <div class="nav-item" onclick="go('liste', this)"><b>📋</b>AYLIK LİSTE</div>
+    <div class="nav-item" onclick="go('finans', this)"><b>💰</b>CÜZDAN</div>
+</div>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('kg_v6_db')) || [];
+    const FIYAT = 30;
+
+    window.onload = () => { document.getElementById('f-tarih').valueAsDate = new Date(); };
+
+    function go(p, el) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        document.getElementById('p-' + p).classList.add('active');
+        el.classList.add('active');
+        if(p === 'liste') listeCiz();
+        if(p === 'finans') finansCiz();
+    }
+
+    function veriKaydet() {
+        const val = (id) => Number(document.getElementById(id).value);
+        const tarih = document.getElementById('f-tarih').value;
+        const veri = {
+            tarih: tarih,
+            ay: tarih.substring(0, 7), // Örn: 2026-03
+            gorev: val('f-gorev'),
+            parca: val('f-parca'),
+            devir: val('f-devir'),
+            toplama: val('f-toplama'),
+            km: val('f-km'),
+            gider: val('f-gider'),
+            net: val('f-gorev') - val('f-devir'),
+            kazanc: (val('f-gorev') - val('f-devir')) * FIYAT
+        };
+        db.push(veri);
+        db.sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
+        localStorage.setItem('kg_v6_db', JSON.stringify(db));
+        alert("Kaydedildi.");
+        resetForm();
+        go('liste', document.querySelectorAll('.nav-item')[1]);
+    }
+
+    function resetForm() {
+        ["f-gorev", "f-parca", "f-devir", "f-toplama", "f-km"].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('f-gider').value = "0";
+    }
+
+    function listeCiz() {
+        const area = document.getElementById('listeArea');
+        area.innerHTML = "";
+        if(!db.length) { area.innerHTML = "<p style='text-align:center; padding-top:50px; opacity:0.5;'>Kayıt yok.</p>"; return; }
+
+        // Aylara göre grupla
+        const gruplar = {};
+        db.forEach(item => {
+            if(!gruplar[item.ay]) gruplar[item.ay] = [];
+            gruplar[item.ay].push(item);
+        });
+
+        // Ayları azalan sırada yazdır
+        Object.keys(gruplar).sort().reverse().forEach(ay => {
+            const ayVerileri = gruplar[ay];
+            const ayNet = ayVerileri.reduce((s, x) => s + x.net, 0);
+            
+            // Ay Başlığı
+            const baslik = document.createElement('div');
+            baslik.className = "month-group-header";
+            const ayIsmi = new Date(ay + "-01").toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
+            baslik.innerHTML = `<span>📅 ${ayIsmi.toUpperCase()}</span> <span class="month-total-badge">${ayNet} Paket</span>`;
+            area.appendChild(baslik);
+
+            // O aya ait günlük kartlar
+            ayVerileri.forEach((item, idx) => {
+                const gun = document.createElement('div');
+                gun.className = "day-card";
+                gun.innerHTML = `
+                    <div class="day-header">
+                        <span>${item.tarih.split('-').reverse().join('.')}</span>
+                        <span onclick="tekSil('${item.tarih}', ${item.gorev})">🗑️</span>
+                    </div>
+                    <div class="stat"><span>GÖREV</span><b>${item.gorev}</b></div>
+                    <div class="stat"><span>PARÇA</span><b>${item.parca}</b></div>
+                    <div class="stat" style="color:var(--yesil)"><span>NET</span><b>${item.net}</b></div>
+                    <div class="stat"><span>DEVİR</span><b>${item.devir}</b></div>
+                    <div class="stat"><span>TOPLAMA</span><b>${item.toplama}</b></div>
+                    <div class="stat"><span>KM</span><b>${item.km}</b></div>
+                `;
+                area.appendChild(gun);
+            });
+        });
+    }
+
+    function finansCiz() {
+        document.getElementById('total-kazanc').innerText = db.reduce((s, x) => s + x.kazanc, 0).toLocaleString() + " ₺";
+        document.getElementById('total-gider').innerText = db.reduce((s, x) => s + x.gider, 0).toLocaleString() + " ₺";
+    }
+
+    function tekSil(tarih, gorev) {
+        if(confirm("Silinsin mi?")) {
+            db = db.filter(x => !(x.tarih === tarih && x.gorev === gorev));
+            localStorage.setItem('kg_v6_db', JSON.stringify(db));
+            listeCiz();
+        }
+    }
+
+    function yedekle() {
+        const blob = new Blob([JSON.stringify(db)], {type: "application/json"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "kg_master_yedek.json";
+        a.click();
+    }
+
+    function excelIndir() {
+        const ws = XLSX.utils.json_to_sheet(db);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Rapor");
+        XLSX.writeFile(wb, "KG_Master_Aylik.xlsx");
+    }
+</script>
+</body>
+</html>

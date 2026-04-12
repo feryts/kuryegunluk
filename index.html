@@ -90,19 +90,12 @@
             <h2>Yeni Gün Kaydı</h2>
             <div class="grid-input">
                 <div class="input-box full-width"><label>Tarih</label><input type="date" id="tarih"></div>
-                <div class="input-box">
-                    <label>Görev Sayısı</label>
-                    <input type="number" id="gorev" placeholder="0" oninput="autoHesapla()">
-                </div>
-                <div class="input-box">
-                    <label>Otomatik Gelir (Görev x 30₺)</label>
-                    <input type="text" id="oto-gelir" value="0 ₺" disabled style="background:#dcfce7; color:#166534; font-weight:bold; border-color:#86efac;">
-                </div>
-                <div class="input-box"><label>Parça Sayısı</label><input type="number" id="parca" placeholder="0"></div>
+                <div class="input-box"><label>Görev Sayısı</label><input type="number" id="gorev" placeholder="0"></div>
                 <div class="input-box"><label>Devir</label><input type="number" id="devir" placeholder="0"></div>
+                <div class="input-box"><label>Parça Sayısı</label><input type="number" id="parca" placeholder="0"></div>
                 <div class="input-box"><label>Toplama</label><input type="number" id="toplama" placeholder="0"></div>
                 <div class="input-box"><label>Günlük KM</label><input type="number" id="km" placeholder="0"></div>
-                <div class="input-box full-width"><label>Günlük Gider (₺)</label><input type="number" id="gider" placeholder="0"></div>
+                <div class="input-box"><label>Günlük Gider (₺)</label><input type="number" id="gider" placeholder="0"></div>
             </div>
             <button class="btn btn-save" onclick="saveData()">SİSTEME İŞLE</button>
         </div>
@@ -159,12 +152,6 @@
     let db = JSON.parse(localStorage.getItem('kuryegunluk_data_pro')) || [];
     document.getElementById('tarih').valueAsDate = new Date();
 
-    // Otomatik Gelir Hesaplama
-    function autoHesapla() {
-        const gorev = parseInt(document.getElementById('gorev').value) || 0;
-        document.getElementById('oto-gelir').value = (gorev * 30) + " ₺";
-    }
-
     // Sayfa Gezinme
     function showPage(num, btn) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -176,15 +163,19 @@
         if(num === 3) updateMonthlyStats();
     }
 
-    // Veri Kaydetme
+    // Veri Kaydetme (Arka planda hesaplama yapar)
     function saveData() {
         const gorevSayisi = parseInt(document.getElementById('gorev').value) || 0;
+        const devirSayisi = parseInt(document.getElementById('devir').value) || 0;
+        // Negatif değere düşmesini engellemek için Math.max kullanıyoruz
+        const netGorev = Math.max(0, gorevSayisi - devirSayisi);
+        
         const entry = {
             tarih: document.getElementById('tarih').value,
             gorev: gorevSayisi,
-            gelir: gorevSayisi * 30,
+            devir: devirSayisi,
+            gelir: netGorev * 30,
             parca: parseInt(document.getElementById('parca').value) || 0,
-            devir: parseInt(document.getElementById('devir').value) || 0,
             toplama: parseInt(document.getElementById('toplama').value) || 0,
             km: parseInt(document.getElementById('km').value) || 0,
             gider: parseFloat(document.getElementById('gider').value) || 0
@@ -198,7 +189,6 @@
         
         // Inputları temizle
         ['gorev', 'parca', 'devir', 'toplama', 'km', 'gider'].forEach(id => { document.getElementById(id).value = ''; });
-        document.getElementById('oto-gelir').value = "0 ₺";
         
         alert("Operasyon ve finans verisi başarıyla kaydedildi!");
     }
@@ -315,5 +305,4 @@
 </script>
 
 </body>
-    </html>
-    
+</html>

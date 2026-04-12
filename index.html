@@ -3,246 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KG Master v6 - Aylık Takip</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>Kurye Operasyon Merkezi PRO</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        
         :root {
-            --kg-sari: #ffcc00; --kg-lacivert: #0f172a; --arka: #f1f5f9;
-            --yazi: #1e293b; --yesil: #10b981; --kirmizi: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --accent-color: #3b82f6;
+            --accent-light: #eff6ff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --whatsapp: #25d366;
         }
 
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #eef2f6; color: var(--yazi); padding-bottom: 100px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-primary); padding: 15px; line-height: 1.5; padding-bottom: 30px; }
+        .container { max-width: 600px; margin: 0 auto; }
 
-        .header { 
-            background: var(--kg-lacivert); color: var(--kg-sari); padding: 20px; 
-            text-align: center; font-weight: 800; border-bottom: 4px solid var(--kg-sari);
-            position: sticky; top: 0; z-index: 1001;
+        /* Navigasyon */
+        .nav-bar { display: flex; background: var(--card-bg); border-radius: 16px; padding: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); gap: 5px; }
+        .nav-btn { flex: 1; padding: 14px 5px; border: none; background: transparent; color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 12px; transition: 0.3s; }
+        .nav-btn.active { background: var(--accent-light); color: var(--accent-color); box-shadow: inset 0 0 0 1px var(--accent-color); }
+
+        /* Sayfa Geçişleri */
+        .page { display: none; animation: slideUp 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Kart Tasarımı */
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        h2 { font-size: 1.15rem; margin-bottom: 20px; color: var(--text-primary); border-bottom: 2px solid var(--bg-color); padding-bottom: 12px; }
+
+        /* Form Elemanları */
+        .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        .input-box { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+        input { background: var(--bg-color); border: 1px solid var(--border); padding: 14px; border-radius: 12px; color: var(--text-primary); font-size: 1.05rem; outline: none; transition: 0.2s; width: 100%; }
+        input:focus { border-color: var(--accent-color); background: #fff; box-shadow: 0 0 0 4px var(--accent-light); }
+
+        /* Butonlar */
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+        .btn-save { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-secondary); font-size: 0.95rem; }
+
+        /* Akıllı Kart Tasarımı (Geçmiş) */
+        .smart-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
+        .sc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 10px; }
+        .sc-date { font-weight: 700; color: var(--text-primary); font-size: 1.1rem; }
+        .sc-wa-btn { background: var(--whatsapp); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        
+        .sc-body { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; margin-bottom: 15px; }
+        .sc-stat { display: flex; flex-direction: column; gap: 4px; background: var(--bg-color); padding: 8px 4px; border-radius: 10px; }
+        .sc-stat span { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
+        .sc-stat strong { font-size: 1.05rem; color: var(--accent-color); }
+        
+        .sc-finance { display: flex; justify-content: space-between; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.9rem; font-weight: 600; }
+        .sc-income { color: var(--success); }
+        .sc-expense { color: var(--danger); }
+
+        /* İstatistik Grid */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .stat-item { background: var(--bg-color); padding: 18px; border-radius: 16px; text-align: center; border: 1px solid var(--border); }
+        .stat-val { font-size: 1.5rem; font-weight: 800; display: block; color: var(--accent-color); margin-top: 5px; }
+
+        @media (max-width: 480px) {
+            .grid-input { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .sc-body { grid-template-columns: repeat(2, 1fr); }
         }
-
-        .container { padding: 15px; max-width: 480px; margin: auto; }
-
-        .card { 
-            background: white; border-radius: 24px; padding: 20px; 
-            margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; 
-        }
-
-        /* Aylık Başlık Stili */
-        .month-group-header {
-            background: var(--kg-lacivert); color: white;
-            padding: 12px 20px; border-radius: 15px; margin: 25px 0 15px 0;
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: 800; font-size: 14px; box-shadow: 0 4px 10px rgba(15,23,42,0.2);
-        }
-        .month-total-badge { background: var(--kg-sari); color: var(--kg-lacivert); padding: 4px 10px; border-radius: 8px; font-size: 12px; }
-
-        .input-group { margin-bottom: 12px; }
-        label { display: block; font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; margin-left: 5px; }
-        input { 
-            width: 100%; padding: 14px; border-radius: 15px; border: 1.5px solid #cbd5e1; 
-            font-size: 16px; font-weight: 700; background: #fff;
-        }
-        input:focus { outline: none; border-color: var(--kg-sari); }
-
-        .row { display: flex; gap: 10px; } .row div { flex: 1; }
-
-        /* Günlük Küçük Kartlar */
-        .day-card {
-            background: white; border-radius: 18px; padding: 15px; margin-bottom: 8px;
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-            border: 1px solid #e2e8f0; transition: 0.2s;
-        }
-        .day-card:active { background: #f8fafc; }
-        .day-header { grid-column: span 3; display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #64748b; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
-        .stat { text-align: center; }
-        .stat b { font-size: 16px; display: block; color: var(--kg-lacivert); }
-        .stat span { font-size: 9px; color: #94a3b8; font-weight: 700; }
-
-        /* Cüzdan */
-        .wallet-card { text-align: center; padding: 20px; border-radius: 20px; color: white; margin-bottom: 10px; }
-
-        .btn { 
-            width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer;
-        }
-        .btn-save { background: var(--kg-lacivert); color: var(--kg-sari); font-size: 16px; }
-
-        .nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; border-top: 1px solid #e2e8f0; z-index: 1002; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; font-weight: 800; color: #94a3b8; }
-        .nav-item.active { color: var(--kg-lacivert); }
-        .nav-item b { font-size: 20px; display: block; }
-
-        .page { display: none; } .page.active { display: block; }
     </style>
 </head>
 <body>
 
-<div class="header">KG MASTER v6</div>
-
 <div class="container">
-    
-    <div id="p-kayit" class="page active">
+    <div class="nav-bar">
+        <button class="nav-btn active" onclick="showPage(1, this)">VERİ GİRİŞİ</button>
+        <button class="nav-btn" onclick="showPage(2, this)">GEÇMİŞ</button>
+        <button class="nav-btn" onclick="showPage(3, this)">RAPOR & YEDEK</button>
+    </div>
+
+    <div id="p1" class="page active">
         <div class="card">
-            <label>TARİH</label>
-            <input type="date" id="f-tarih" class="input-group">
-            
-            <div class="row">
-                <div class="input-group"><label>GÖREV</label><input type="number" id="f-gorev" inputmode="numeric"></div>
-                <div class="input-group"><label>PARÇA</label><input type="number" id="f-parca" inputmode="numeric"></div>
+            <h2>Yeni Gün Kaydı</h2>
+            <div class="grid-input">
+                <div class="input-box full-width"><label>Tarih</label><input type="date" id="tarih"></div>
+                <div class="input-box">
+                    <label>Görev Sayısı</label>
+                    <input type="number" id="gorev" placeholder="0" oninput="autoHesapla()">
+                </div>
+                <div class="input-box">
+                    <label>Otomatik Gelir (Görev x 30₺)</label>
+                    <input type="text" id="oto-gelir" value="0 ₺" disabled style="background:#dcfce7; color:#166534; font-weight:bold; border-color:#86efac;">
+                </div>
+                <div class="input-box"><label>Parça Sayısı</label><input type="number" id="parca" placeholder="0"></div>
+                <div class="input-box"><label>Devir</label><input type="number" id="devir" placeholder="0"></div>
+                <div class="input-box"><label>Toplama</label><input type="number" id="toplama" placeholder="0"></div>
+                <div class="input-box"><label>Günlük KM</label><input type="number" id="km" placeholder="0"></div>
+                <div class="input-box full-width"><label>Günlük Gider (₺)</label><input type="number" id="gider" placeholder="0"></div>
             </div>
-            <div class="row">
-                <div class="input-group"><label>DEVİR</label><input type="number" id="f-devir" inputmode="numeric"></div>
-                <div class="input-group"><label>TOPLAMA</label><input type="number" id="f-toplama" inputmode="numeric"></div>
-            </div>
-            <div class="row">
-                <div class="input-group"><label>KM</label><input type="number" id="f-km" inputmode="numeric"></div>
-                <div class="input-group"><label>GİDER (TL)</label><input type="number" id="f-gider" value="0" inputmode="decimal"></div>
-            </div>
-            <button class="btn btn-save" onclick="veriKaydet()">VERİYİ SİSTEME EKLE</button>
+            <button class="btn btn-save" onclick="saveData()">SİSTEME İŞLE</button>
         </div>
     </div>
 
-    <div id="p-liste" class="page">
-        <div id="listeArea"></div>
+    <div id="p2" class="page">
+        <div class="card" style="padding-bottom: 10px;">
+            <h2 style="border: none; margin-bottom: 5px;">Kayıtları Filtrele</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="month" id="filter-month" onchange="renderHistoryCards()" style="flex: 1;">
+                <button class="btn btn-outline" style="width: auto; margin-top: 0; padding: 0 20px;" onclick="resetFilter()">Tümü</button>
+            </div>
+        </div>
+
+        <div id="smart-cards-container">
+            </div>
     </div>
 
-    <div id="p-finans" class="page">
-        <div class="wallet-card" style="background: #10b981;">
-            <span style="font-size:12px; font-weight:700;">TOPLAM GELİR</span>
-            <span style="font-size:32px; font-weight:800; display:block;" id="total-kazanc">0 ₺</span>
+    <div id="p3" class="page">
+        <div class="card">
+            <h2>Bu Ayın Finansal Özeti</h2>
+            <div class="stat-grid">
+                <div class="stat-item full-width" style="background:#f0fdf4; border-color:#86efac;">
+                    <label>Aylık Toplam Gelir</label>
+                    <span id="mon-gelir" class="stat-val" style="color:var(--success);">0 ₺</span>
+                </div>
+                <div class="stat-item full-width" style="background:#fef2f2; border-color:#fca5a5;">
+                    <label>Aylık Toplam Gider</label>
+                    <span id="mon-gider" class="stat-val" style="color:var(--danger);">0 ₺</span>
+                </div>
+            </div>
         </div>
-        <div class="wallet-card" style="background: #ef4444;">
-            <span style="font-size:12px; font-weight:700;">TOPLAM GİDER</span>
-            <span style="font-size:32px; font-weight:800; display:block;" id="total-gider">0 ₺</span>
+
+        <div class="card">
+            <h2>Bu Ayın İş Performansı</h2>
+            <div class="stat-grid">
+                <div class="stat-item"><label>Toplam Görev</label><span id="mon-gorev" class="stat-val">0</span></div>
+                <div class="stat-item"><label>Toplam KM</label><span id="mon-km" class="stat-val" style="color:var(--text-primary);">0</span></div>
+            </div>
         </div>
-        <button class="btn" style="background:white; border:1px solid #ddd; margin-bottom:10px;" onclick="yedekle()">📥 VERİLERİ YEDEKLE (JSON)</button>
-        <button class="btn" style="background:var(--kg-lacivert); color:var(--kg-sari);" onclick="excelIndir()">📗 EXCEL'E AKTAR</button>
+
+        <div class="card">
+            <h2>Veri Güvenliği</h2>
+            <button class="btn btn-outline" onclick="exportData()">💾 Yedeği Telefona İndir</button>
+            <div style="margin-top:20px; border-top: 1px solid var(--border); padding-top: 15px;">
+                <label style="font-size:0.8rem; display: block; margin-bottom: 8px;">Dışarıdan Yedek Yükle:</label>
+                <input type="file" id="importFile" onchange="importData()" style="padding:10px; font-size: 0.9rem; width: 100%;">
+            </div>
+        </div>
     </div>
-
-</div>
-
-<div class="nav">
-    <div class="nav-item active" onclick="go('kayit', this)"><b>📝</b>GİRİŞ</div>
-    <div class="nav-item" onclick="go('liste', this)"><b>📋</b>AYLIK LİSTE</div>
-    <div class="nav-item" onclick="go('finans', this)"><b>💰</b>CÜZDAN</div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('kg_v6_db')) || [];
-    const FIYAT = 30;
+    let db = JSON.parse(localStorage.getItem('kuryegunluk_data_pro')) || [];
+    document.getElementById('tarih').valueAsDate = new Date();
 
-    window.onload = () => { document.getElementById('f-tarih').valueAsDate = new Date(); };
-
-    function go(p, el) {
-        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        document.getElementById('p-' + p).classList.add('active');
-        el.classList.add('active');
-        if(p === 'liste') listeCiz();
-        if(p === 'finans') finansCiz();
+    // Otomatik Gelir Hesaplama
+    function autoHesapla() {
+        const gorev = parseInt(document.getElementById('gorev').value) || 0;
+        document.getElementById('oto-gelir').value = (gorev * 30) + " ₺";
     }
 
-    function veriKaydet() {
-        const val = (id) => Number(document.getElementById(id).value);
-        const tarih = document.getElementById('f-tarih').value;
-        const veri = {
-            tarih: tarih,
-            ay: tarih.substring(0, 7), // Örn: 2026-03
-            gorev: val('f-gorev'),
-            parca: val('f-parca'),
-            devir: val('f-devir'),
-            toplama: val('f-toplama'),
-            km: val('f-km'),
-            gider: val('f-gider'),
-            net: val('f-gorev') - val('f-devir'),
-            kazanc: (val('f-gorev') - val('f-devir')) * FIYAT
+    // Sayfa Gezinme
+    function showPage(num, btn) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('p' + num).classList.add('active');
+        btn.classList.add('active');
+        
+        if(num === 2) renderHistoryCards();
+        if(num === 3) updateMonthlyStats();
+    }
+
+    // Veri Kaydetme
+    function saveData() {
+        const gorevSayisi = parseInt(document.getElementById('gorev').value) || 0;
+        const entry = {
+            tarih: document.getElementById('tarih').value,
+            gorev: gorevSayisi,
+            gelir: gorevSayisi * 30,
+            parca: parseInt(document.getElementById('parca').value) || 0,
+            devir: parseInt(document.getElementById('devir').value) || 0,
+            toplama: parseInt(document.getElementById('toplama').value) || 0,
+            km: parseInt(document.getElementById('km').value) || 0,
+            gider: parseFloat(document.getElementById('gider').value) || 0
         };
-        db.push(veri);
+
+        const idx = db.findIndex(x => x.tarih === entry.tarih);
+        if(idx > -1) db[idx] = entry; else db.push(entry);
+        
         db.sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
-        localStorage.setItem('kg_v6_db', JSON.stringify(db));
-        alert("Kaydedildi.");
-        resetForm();
-        go('liste', document.querySelectorAll('.nav-item')[1]);
+        localStorage.setItem('kuryegunluk_data_pro', JSON.stringify(db));
+        
+        // Inputları temizle
+        ['gorev', 'parca', 'devir', 'toplama', 'km', 'gider'].forEach(id => { document.getElementById(id).value = ''; });
+        document.getElementById('oto-gelir').value = "0 ₺";
+        
+        alert("Operasyon ve finans verisi başarıyla kaydedildi!");
     }
 
-    function resetForm() {
-        ["f-gorev", "f-parca", "f-devir", "f-toplama", "f-km"].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('f-gider').value = "0";
-    }
+    // Akıllı Kartları Oluşturma
+    function renderHistoryCards() {
+        const container = document.getElementById('smart-cards-container');
+        const filter = document.getElementById('filter-month').value;
+        container.innerHTML = '';
 
-    function listeCiz() {
-        const area = document.getElementById('listeArea');
-        area.innerHTML = "";
-        if(!db.length) { area.innerHTML = "<p style='text-align:center; padding-top:50px; opacity:0.5;'>Kayıt yok.</p>"; return; }
+        const filteredDb = db.filter(x => !filter || x.tarih.startsWith(filter));
 
-        // Aylara göre grupla
-        const gruplar = {};
-        db.forEach(item => {
-            if(!gruplar[item.ay]) gruplar[item.ay] = [];
-            gruplar[item.ay].push(item);
-        });
-
-        // Ayları azalan sırada yazdır
-        Object.keys(gruplar).sort().reverse().forEach(ay => {
-            const ayVerileri = gruplar[ay];
-            const ayNet = ayVerileri.reduce((s, x) => s + x.net, 0);
-            
-            // Ay Başlığı
-            const baslik = document.createElement('div');
-            baslik.className = "month-group-header";
-            const ayIsmi = new Date(ay + "-01").toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
-            baslik.innerHTML = `<span>📅 ${ayIsmi.toUpperCase()}</span> <span class="month-total-badge">${ayNet} Paket</span>`;
-            area.appendChild(baslik);
-
-            // O aya ait günlük kartlar
-            ayVerileri.forEach((item, idx) => {
-                const gun = document.createElement('div');
-                gun.className = "day-card";
-                gun.innerHTML = `
-                    <div class="day-header">
-                        <span>${item.tarih.split('-').reverse().join('.')}</span>
-                        <span onclick="tekSil('${item.tarih}', ${item.gorev})">🗑️</span>
-                    </div>
-                    <div class="stat"><span>GÖREV</span><b>${item.gorev}</b></div>
-                    <div class="stat"><span>PARÇA</span><b>${item.parca}</b></div>
-                    <div class="stat" style="color:var(--yesil)"><span>NET</span><b>${item.net}</b></div>
-                    <div class="stat"><span>DEVİR</span><b>${item.devir}</b></div>
-                    <div class="stat"><span>TOPLAMA</span><b>${item.toplama}</b></div>
-                    <div class="stat"><span>KM</span><b>${item.km}</b></div>
-                `;
-                area.appendChild(gun);
-            });
-        });
-    }
-
-    function finansCiz() {
-        document.getElementById('total-kazanc').innerText = db.reduce((s, x) => s + x.kazanc, 0).toLocaleString() + " ₺";
-        document.getElementById('total-gider').innerText = db.reduce((s, x) => s + x.gider, 0).toLocaleString() + " ₺";
-    }
-
-    function tekSil(tarih, gorev) {
-        if(confirm("Silinsin mi?")) {
-            db = db.filter(x => !(x.tarih === tarih && x.gorev === gorev));
-            localStorage.setItem('kg_v6_db', JSON.stringify(db));
-            listeCiz();
+        if(filteredDb.length === 0) {
+            container.innerHTML = `<div style="text-align:center; color:#64748b; padding:20px;">Kayıt bulunamadı.</div>`;
+            return;
         }
+
+        filteredDb.forEach(x => {
+            const tarihFormat = x.tarih.split('-').reverse().join('.');
+            
+            const cardHTML = `
+                <div class="smart-card">
+                    <div class="sc-header">
+                        <div class="sc-date">📅 ${tarihFormat}</div>
+                        <button class="sc-wa-btn" onclick="shareDayCard('${x.tarih}')">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.386 0 12.033c0 2.656.692 5.244 2.008 7.525L.65 24l4.58-1.341c2.193 1.187 4.673 1.815 7.202 1.815h.004c6.645 0 12.031-5.386 12.031-12.033C24.467 5.386 19.08 0 12.031 0z"/></svg>
+                            Gönder
+                        </button>
+                    </div>
+                    <div class="sc-body">
+                        <div class="sc-stat"><span>Görev</span><strong>${x.gorev}</strong></div>
+                        <div class="sc-stat"><span>Parça</span><strong>${x.parca}</strong></div>
+                        <div class="sc-stat"><span>Devir</span><strong>${x.devir}</strong></div>
+                        <div class="sc-stat"><span>Toplama</span><strong>${x.toplama}</strong></div>
+                    </div>
+                    <div class="sc-finance">
+                        <span class="sc-income">💰 Gelir: ${x.gelir} ₺</span>
+                        <span class="sc-expense">📉 Gider: ${x.gider} ₺</span>
+                    </div>
+                    ${x.km > 0 ? `<div style="text-align:center; font-size:0.8rem; color:#64748b; margin-top:10px;">🛣️ Yapılan Mesafe: ${x.km} KM</div>` : ''}
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        });
     }
 
-    function yedekle() {
-        const blob = new Blob([JSON.stringify(db)], {type: "application/json"});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = "kg_master_yedek.json";
-        a.click();
+    function resetFilter() { document.getElementById('filter-month').value = ''; renderHistoryCards(); }
+
+    // Rapor Sekmesini Güncelleme
+    function updateMonthlyStats() {
+        const now = new Date();
+        const curM = now.getMonth();
+        const curY = now.getFullYear();
+        let sGorev = 0, sKm = 0, sGelir = 0, sGider = 0;
+        
+        db.forEach(x => {
+            const d = new Date(x.tarih);
+            if(d.getMonth() === curM && d.getFullYear() === curY) {
+                sGorev += x.gorev; sKm += x.km; sGelir += (x.gelir || 0); sGider += (x.gider || 0);
+            }
+        });
+        
+        document.getElementById('mon-gorev').innerText = sGorev;
+        document.getElementById('mon-km').innerText = sKm;
+        document.getElementById('mon-gelir').innerText = sGelir.toLocaleString() + " ₺";
+        document.getElementById('mon-gider').innerText = sGider.toLocaleString() + " ₺";
     }
 
-    function excelIndir() {
-        const ws = XLSX.utils.json_to_sheet(db);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Rapor");
-        XLSX.writeFile(wb, "KG_Master_Aylik.xlsx");
+    // WhatsApp Paylaşımı
+    function shareDayCard(tarih) {
+        const veri = db.find(x => x.tarih === tarih);
+        if(!veri) return;
+        
+        const tarihFormat = veri.tarih.split('-').reverse().join('.');
+        const mesaj = `🚀 *Kurye Operasyon Özeti* (${tarihFormat})\n\n` +
+                      `✅ Görev: ${veri.gorev}\n` +
+                      `📦 Parça: ${veri.parca}\n` +
+                      `🔄 Devir: ${veri.devir}\n` +
+                      `📥 Toplama: ${veri.toplama}\n` +
+                      `🛣️ Mesafe: ${veri.km} KM\n\n` +
+                      `💰 *Günlük Kazanç:* ${veri.gelir} ₺\n` +
+                      `📉 *Günlük Gider:* ${veri.gider} ₺`;
+        
+        window.open(`https://wa.me/?text=${encodeURIComponent(mesaj)}`, '_blank');
+    }
+
+    // Yedekleme İşlemleri
+    function exportData() {
+        const dataStr = JSON.stringify(db);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', `kuryegunluk_yedek_${new Date().toLocaleDateString()}.json`);
+        linkElement.click();
+    }
+
+    function importData() {
+        const file = document.getElementById('importFile').files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if(confirm("Eski verilerinizin üzerine yazılsın mı? Bu işlem geri alınamaz.")) {
+                    db = imported;
+                    localStorage.setItem('kuryegunluk_data_pro', JSON.stringify(db));
+                    alert("Yedek başarıyla yüklendi!");
+                    location.reload();
+                }
+            } catch(err) { alert("Hatalı dosya formatı!"); }
+        };
+        reader.readAsText(file);
     }
 </script>
+
 </body>
-</html>
+    </html>
+    

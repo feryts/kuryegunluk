@@ -15,6 +15,7 @@
             --border: #e2e8f0;
             --success: #10b981;
             --danger: #ef4444;
+            --warning: #f59e0b;
             --whatsapp: #25d366;
         }
 
@@ -55,10 +56,13 @@
         .sc-date { font-weight: 700; color: var(--text-primary); font-size: 1.1rem; }
         .sc-wa-btn { background: var(--whatsapp); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         
-        .sc-body { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; margin-bottom: 15px; }
+        .sc-body { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; margin-bottom: 12px; }
         .sc-stat { display: flex; flex-direction: column; gap: 4px; background: var(--bg-color); padding: 8px 4px; border-radius: 10px; }
         .sc-stat span { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
         .sc-stat strong { font-size: 1.05rem; color: var(--accent-color); }
+
+        .sc-net { background: var(--accent-light); padding: 10px; border-radius: 10px; margin-bottom: 15px; text-align: center; border: 1px dashed var(--accent-color); }
+        .sc-net span { font-size: 0.9rem; color: var(--accent-color); font-weight: 700; }
         
         .sc-finance { display: flex; justify-content: space-between; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.9rem; font-weight: 600; }
         .sc-income { color: var(--success); }
@@ -66,13 +70,14 @@
 
         /* İstatistik Grid */
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .stat-item { background: var(--bg-color); padding: 18px; border-radius: 16px; text-align: center; border: 1px solid var(--border); }
-        .stat-val { font-size: 1.5rem; font-weight: 800; display: block; color: var(--accent-color); margin-top: 5px; }
+        .stat-item { background: var(--bg-color); padding: 16px; border-radius: 16px; text-align: center; border: 1px solid var(--border); }
+        .stat-val { font-size: 1.4rem; font-weight: 800; display: block; color: var(--accent-color); margin-top: 5px; }
 
         @media (max-width: 480px) {
             .grid-input { grid-template-columns: 1fr; }
             .full-width { grid-column: span 1; }
             .sc-body { grid-template-columns: repeat(2, 1fr); }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -131,9 +136,12 @@
 
         <div class="card">
             <h2>Bu Ayın İş Performansı</h2>
-            <div class="stat-grid">
+            <div class="stat-grid" style="grid-template-columns: 1fr 1fr;">
                 <div class="stat-item"><label>Toplam Görev</label><span id="mon-gorev" class="stat-val">0</span></div>
-                <div class="stat-item"><label>Toplam KM</label><span id="mon-km" class="stat-val" style="color:var(--text-primary);">0</span></div>
+                <div class="stat-item"><label>Toplam Parça</label><span id="mon-parca" class="stat-val">0</span></div>
+                <div class="stat-item"><label>Toplama</label><span id="mon-toplama" class="stat-val">0</span></div>
+                <div class="stat-item"><label>Devir</label><span id="mon-devir" class="stat-val" style="color:var(--warning);">0</span></div>
+                <div class="stat-item full-width"><label>Toplam KM</label><span id="mon-km" class="stat-val" style="color:var(--text-primary);">0</span></div>
             </div>
         </div>
 
@@ -166,16 +174,18 @@
     // Veri Kaydetme (Arka planda hesaplama yapar)
     function saveData() {
         const gorevSayisi = parseInt(document.getElementById('gorev').value) || 0;
+        const parcaSayisi = parseInt(document.getElementById('parca').value) || 0;
         const devirSayisi = parseInt(document.getElementById('devir').value) || 0;
-        // Negatif değere düşmesini engellemek için Math.max kullanıyoruz
-        const netGorev = Math.max(0, gorevSayisi - devirSayisi);
+        
+        // Gelir hesabı için Görev'den Devir çıkarılır. Negatif olmaması için Math.max kullanılır.
+        const netGorevForIncome = Math.max(0, gorevSayisi - devirSayisi);
         
         const entry = {
             tarih: document.getElementById('tarih').value,
             gorev: gorevSayisi,
+            parca: parcaSayisi,
             devir: devirSayisi,
-            gelir: netGorev * 30,
-            parca: parseInt(document.getElementById('parca').value) || 0,
+            gelir: netGorevForIncome * 30,
             toplama: parseInt(document.getElementById('toplama').value) || 0,
             km: parseInt(document.getElementById('km').value) || 0,
             gider: parseFloat(document.getElementById('gider').value) || 0
@@ -209,6 +219,10 @@
         filteredDb.forEach(x => {
             const tarihFormat = x.tarih.split('-').reverse().join('.');
             
+            // Net Teslimat Hesaplamaları
+            const netGorev = Math.max(0, x.gorev - x.devir);
+            const netParca = Math.max(0, x.parca - x.devir);
+            
             const cardHTML = `
                 <div class="smart-card">
                     <div class="sc-header">
@@ -224,6 +238,11 @@
                         <div class="sc-stat"><span>Toplama</span><strong>${x.toplama}</strong></div>
                         <div class="sc-stat"><span>Devir</span><strong>${x.devir}</strong></div>
                     </div>
+                    
+                    <div class="sc-net">
+                        <span>🏆 Net Teslimat: ${netGorev} Görev | ${netParca} Parça</span>
+                    </div>
+
                     <div class="sc-finance">
                         <span class="sc-income">💰 Gelir: ${x.gelir} ₺</span>
                         <span class="sc-expense">📉 Gider: ${x.gider} ₺</span>
@@ -242,16 +261,25 @@
         const now = new Date();
         const curM = now.getMonth();
         const curY = now.getFullYear();
-        let sGorev = 0, sKm = 0, sGelir = 0, sGider = 0;
+        let sGorev = 0, sParca = 0, sToplama = 0, sDevir = 0, sKm = 0, sGelir = 0, sGider = 0;
         
         db.forEach(x => {
             const d = new Date(x.tarih);
             if(d.getMonth() === curM && d.getFullYear() === curY) {
-                sGorev += x.gorev; sKm += x.km; sGelir += (x.gelir || 0); sGider += (x.gider || 0);
+                sGorev += x.gorev; 
+                sParca += x.parca; 
+                sToplama += x.toplama; 
+                sDevir += x.devir; 
+                sKm += x.km; 
+                sGelir += (x.gelir || 0); 
+                sGider += (x.gider || 0);
             }
         });
         
         document.getElementById('mon-gorev').innerText = sGorev;
+        document.getElementById('mon-parca').innerText = sParca;
+        document.getElementById('mon-toplama').innerText = sToplama;
+        document.getElementById('mon-devir').innerText = sDevir;
         document.getElementById('mon-km').innerText = sKm;
         document.getElementById('mon-gelir').innerText = sGelir.toLocaleString() + " ₺";
         document.getElementById('mon-gider').innerText = sGider.toLocaleString() + " ₺";
@@ -263,12 +291,18 @@
         if(!veri) return;
         
         const tarihFormat = veri.tarih.split('-').reverse().join('.');
+        
+        // WhatsApp için Net Teslimat
+        const netGorev = Math.max(0, veri.gorev - veri.devir);
+        const netParca = Math.max(0, veri.parca - veri.devir);
+
         const mesaj = `🚀 *Kurye Operasyon Özeti* (${tarihFormat})\n\n` +
                       `✅ Görev: ${veri.gorev}\n` +
                       `📦 Parça: ${veri.parca}\n` +
                       `📥 Toplama: ${veri.toplama}\n` +
                       `🔄 Devir: ${veri.devir}\n` +
                       `🛣️ Mesafe: ${veri.km} KM\n\n` +
+                      `🏆 *NET TESLİMAT:* ${netGorev} Görev, ${netParca} Parça\n\n` +
                       `💰 *Günlük Kazanç:* ${veri.gelir} ₺\n` +
                       `📉 *Günlük Gider:* ${veri.gider} ₺`;
         

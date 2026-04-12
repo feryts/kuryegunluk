@@ -168,8 +168,26 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('kuryegunluk_data_pro')) || [];
-    document.getElementById('tarih').valueAsDate = new Date();
+    // 1. GÜVENLİ VERİ YÜKLEME (Hata yakalama kalkanı eklendi)
+    let db = [];
+    try {
+        const storedData = localStorage.getItem('kuryegunluk_v_sondurum');
+        if (storedData) {
+            db = JSON.parse(storedData);
+            if (!Array.isArray(db)) db = []; // Veri dizi formatında değilse sıfırla
+        }
+    } catch (err) {
+        console.error("Geçmiş veri okunamadı, temiz bir sayfa açılıyor.");
+        db = [];
+    }
+
+    // 2. GÜVENLİ TARİH ATAMASI (Tüm tarayıcılarda çalışır)
+    window.onload = function() {
+        const bugun = new Date();
+        const offset = bugun.getTimezoneOffset() * 60000;
+        const yerelTarih = new Date(bugun.getTime() - offset).toISOString().split('T')[0];
+        document.getElementById('tarih').value = yerelTarih;
+    };
 
     const aylarListesi = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 
@@ -186,15 +204,20 @@
 
     // Veri Kaydetme
     function saveData() {
+        const tarihDegeri = document.getElementById('tarih').value;
+        if(!tarihDegeri) {
+            alert("Lütfen bir tarih seçin!");
+            return;
+        }
+
         const gorevSayisi = parseInt(document.getElementById('gorev').value) || 0;
         const parcaSayisi = parseInt(document.getElementById('parca').value) || 0;
         const devirSayisi = parseInt(document.getElementById('devir').value) || 0;
         
-        // Gelir hesabı için Görev'den Devir çıkarılır
         const netGorevForIncome = Math.max(0, gorevSayisi - devirSayisi);
         
         const entry = {
-            tarih: document.getElementById('tarih').value,
+            tarih: tarihDegeri,
             gorev: gorevSayisi,
             parca: parcaSayisi,
             devir: devirSayisi,
@@ -208,12 +231,16 @@
         if(idx > -1) db[idx] = entry; else db.push(entry);
         
         db.sort((a,b) => new Date(b.tarih) - new Date(a.tarih));
-        localStorage.setItem('kuryegunluk_data_pro', JSON.stringify(db));
+        
+        try {
+            localStorage.setItem('kuryegunluk_v_sondurum', JSON.stringify(db));
+            alert("Operasyon ve finans verisi başarıyla kaydedildi!");
+        } catch(e) {
+            alert("Kayıt sırasında cihaz hafızası kaynaklı bir hata oluştu.");
+        }
         
         // Inputları temizle
         ['gorev', 'parca', 'toplama', 'devir', 'km', 'gider'].forEach(id => { document.getElementById(id).value = ''; });
-        
-        alert("Operasyon ve finans verisi başarıyla kaydedildi!");
     }
 
     // Akıllı Kartları Oluşturma
@@ -231,8 +258,6 @@
 
         filteredDb.forEach(x => {
             const tarihFormat = x.tarih.split('-').reverse().join('.');
-            
-            // Net Teslimat
             const netGorev = Math.max(0, x.gorev - x.devir);
             const netParca = Math.max(0, x.parca - x.devir);
             
@@ -276,7 +301,6 @@
         const curY = now.getFullYear();
         let sGorev = 0, sParca = 0, sToplama = 0, sDevir = 0, sKm = 0, sGelir = 0, sGider = 0;
         
-        // Ay Başlığını Güncelle
         const ayBasligi = `${aylarListesi[curM]} ${curY}`;
         document.getElementById('mon-title-fin').innerText = ayBasligi;
         document.getElementById('mon-title-is').innerText = ayBasligi;
@@ -335,7 +359,7 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(mesaj)}`, '_blank');
     }
 
-    // Aylık Paylaşım (YENİ)
+    // Aylık Paylaşım
     function shareMonthlyStats() {
         const now = new Date();
         const curM = now.getMonth();
@@ -354,21 +378,4 @@
 
         const netGorev = Math.max(0, sGorev - sDevir);
         const netParca = Math.max(0, sParca - sDevir);
-        const netKazanc = sGelir - sGider;
-
-        const mesaj = `📊 *${ayAdi} Kurye Aylık Raporu*\n\n` +
-                      `✅ Toplam Görev: ${sGorev}\n` +
-                      `📦 Toplam Parça: ${sParca}\n` +
-                      `📥 Toplam Toplama: ${sToplama}\n` +
-                      `🔄 Toplam Devir: ${sDevir}\n` +
-                      `🛣️ Toplam Mesafe: ${sKm} KM\n\n` +
-                      `🏆 *AYLIK NET TESLİMAT:*\n` +
-                      `${netGorev} Görev | ${netParca} Parça\n\n` +
-                      `💰 *Aylık Gelir:* ${sGelir} ₺\n` +
-                      `📉 *Aylık Gider:* ${sGider} ₺\n` +
-                      `💳 *Aylık Net Kazanç:* ${netKazanc} ₺`;
-        
-        window.open(`https://wa.me/?text=${encodeURIComponent(mesaj)}`, '_blank');
-    }
-
-    // Yedekleme İşl
+        const n

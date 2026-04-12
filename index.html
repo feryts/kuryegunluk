@@ -3,73 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kurye PRO v21 - Mobil Operasyon</title>
+    <title>Kurye PRO v22 - Tam Detaylı Rapor</title>
     <style>
         :root {
-            --bg-color: #f0f4f8;
+            --bg-color: #f1f5f9;
             --card-bg: #ffffff;
-            --accent-color: #3b82f6;
-            --accent-dark: #1e40af;
-            --text-primary: #1e293b;
+            --accent-color: #2563eb;
+            --text-primary: #0f172a;
             --text-secondary: #64748b;
+            --border: #e2e8f0;
             --success: #10b981;
             --danger: #ef4444;
             --whatsapp: #25d366;
         }
 
-        /* Mobil Temel Ayarlar */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-primary); padding: 12px; padding-bottom: 50px; }
         .container { max-width: 480px; margin: 0 auto; }
 
-        /* Modern Alt Navigasyon (App Hissi) */
-        .nav-bar { display: flex; background: var(--card-bg); border-radius: 25px; padding: 8px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); gap: 4px; position: sticky; top: 10px; z-index: 1000; border: 1px solid rgba(255,255,255,0.7); }
-        .nav-btn { flex: 1; padding: 10px 2px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 10px; cursor: pointer; border-radius: 20px; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-btn i { font-size: 1.4rem; font-style: normal; }
-        .nav-btn.active { background: var(--accent-color); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        /* Navigasyon */
+        .nav-bar { display: flex; background: var(--card-bg); border-radius: 25px; padding: 8px; margin-bottom: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); gap: 5px; position: sticky; top: 10px; z-index: 1000; }
+        .nav-btn { flex: 1; padding: 10px 2px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 10px; cursor: pointer; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-btn i { font-size: 1.3rem; font-style: normal; }
+        .nav-btn.active { background: var(--accent-color); color: white; }
 
         .page { display: none; animation: slideUp 0.3s ease; }
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Kart Tasarımları */
-        .card { background: var(--card-bg); border-radius: 30px; padding: 22px; border: 1px solid #e2e8f0; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .section-title { font-size: 1.1rem; font-weight: 850; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
-
-        /* Form Yapısı */
+        /* Kartlar */
+        .card { background: var(--card-bg); border-radius: 28px; padding: 22px; border: 1px solid var(--border); margin-bottom: 15px; }
         .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 0.7rem; font-weight: 800; color: var(--accent-color); text-transform: uppercase; margin-left: 4px; }
-        input { background: #f8fafc; border: 2px solid #f1f5f9; padding: 14px; border-radius: 18px; font-size: 1rem; font-weight: 700; color: var(--text-primary); outline: none; transition: 0.2s; width: 100%; -webkit-appearance: none; }
-        input:focus { border-color: var(--accent-color); background: white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        input { background: #f8fafc; border: 2px solid #f1f5f9; padding: 14px; border-radius: 16px; font-size: 1rem; font-weight: 700; outline: none; width: 100%; }
         .full-width { grid-column: span 2; }
 
-        /* Akıllı Kart v21 (Geçmiş ve Rapor Günlükleri) */
-        .smart-card { background: white; border-radius: 28px; padding: 18px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        /* Akıllı Kart v22 */
+        .smart-card { background: white; border-radius: 28px; padding: 18px; margin-bottom: 15px; border: 1px solid var(--border); }
         .sc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 10px; }
-        .sc-date { font-weight: 900; font-size: 1.05rem; }
         .sc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
         .sc-box { background: #f8fafc; padding: 10px 2px; border-radius: 16px; text-align: center; border: 1px solid #f1f5f9; }
-        .sc-box span { font-size: 0.6rem; color: var(--text-secondary); font-weight: 800; display: block; margin-bottom: 3px; }
+        .sc-box span { font-size: 0.6rem; color: var(--text-secondary); font-weight: 800; display: block; }
         .sc-box strong { font-size: 0.9rem; }
         
-        .sc-footer { background: var(--bg-color); padding: 14px 18px; border-radius: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; }
+        .sc-footer { background: #eff6ff; padding: 15px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; }
         .net-badge { font-weight: 900; color: var(--accent-color); font-size: 0.85rem; }
-        .price-badge { font-weight: 900; color: var(--success); font-size: 0.95rem; }
 
-        /* Rapor Üst Panel */
-        .report-hero { background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent-color) 100%); color: white; border-radius: 35px; padding: 30px 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 15px 30px -10px rgba(59, 130, 246, 0.5); }
-        .report-val { font-size: 2.3rem; font-weight: 950; margin: 8px 0; letter-spacing: -1px; }
-
-        /* İlerleme Çubuğu */
-        .progress-container { width: 100%; height: 12px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--success); transition: width 0.5s ease; }
-
-        /* Butonlar */
-        .btn { width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
-        .btn:active { transform: scale(0.96); opacity: 0.9; }
+        /* Rapor */
+        .report-hero { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border-radius: 35px; padding: 30px 20px; text-align: center; margin-bottom: 20px; }
+        
+        .btn { width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
         .btn-save { background: var(--accent-color); color: white; }
-        .btn-wa { background: var(--whatsapp); color: white; margin-top: 10px; }
+        .btn-wa { background: var(--whatsapp); color: white; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -84,61 +70,55 @@
 
     <div id="p1" class="page active">
         <div class="card">
-            <h2 class="section-title">🚀 Veri Kaydı</h2>
+            <h2 style="font-size:1.1rem; font-weight:850; margin-bottom:15px">🚀 Kayıt Ekle</h2>
             <div class="grid-input">
                 <div class="input-group full-width"><label>📅 Tarih</label><input type="date" id="tarih"></div>
                 <div class="input-group"><label>📦 Görev</label><input type="number" id="gorev" inputmode="numeric" placeholder="0"></div>
-                <div class="input-group"><label>🔄 Devir</label><input type="number" id="devir" inputmode="numeric" placeholder="0"></div>
                 <div class="input-group"><label>🎁 Parça</label><input type="number" id="parca" inputmode="numeric" placeholder="0"></div>
                 <div class="input-group"><label>📥 Toplama</label><input type="number" id="toplama" inputmode="numeric" placeholder="0"></div>
+                <div class="input-group"><label>🔄 Devir</label><input type="number" id="devir" inputmode="numeric" placeholder="0"></div>
                 <div class="input-group full-width"><label>🛣️ Mesafe (KM)</label><input type="number" id="km" inputmode="numeric" placeholder="0"></div>
             </div>
-            <button class="btn btn-save" style="margin-top:25px" onclick="saveData()">SİSTEME KAYDET</button>
+            <button class="btn btn-save" style="margin-top:20px" onclick="saveData()">SİSTEME KAYDET</button>
         </div>
     </div>
 
-    <div id="p2" class="page">
-        <div id="history-container"></div>
-    </div>
+    <div id="p2" class="page"><div id="history-container"></div></div>
 
     <div id="p3" class="page">
         <div class="report-hero">
-            <span style="font-size:0.8rem; font-weight:800; opacity:0.9; letter-spacing:1px">AYLIK TOPLAM NET</span>
-            <div class="report-val" id="rep-net-display">0 G / 0 P</div>
-            <div id="rep-income-total" style="font-size:1.1rem; font-weight:700; background:rgba(255,255,255,0.2); display:inline-block; padding:5px 15px; border-radius:12px">0 ₺ Saf Kazanç</div>
+            <span style="font-size:0.8rem; font-weight:800; opacity:0.9">BU AYIN TOPLAMI</span>
+            <div style="font-size:2.3rem; font-weight:950; margin:5px 0" id="rep-net-display">0 G / 0 P</div>
+            <div id="rep-income-total" style="font-size:1.1rem; font-weight:700; background:rgba(255,255,255,0.2); display:inline-block; padding:5px 15px; border-radius:12px">0 ₺</div>
         </div>
-
         <div class="card">
-            <h2 class="section-title">🎯 Hedef İlerleme</h2>
-            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:800; color:var(--text-secondary)">
-                <span>İşlenen: <strong id="prog-cur" style="color:var(--accent-color)">0</strong></span>
-                <span>Hedef: <strong id="prog-target">0</strong></span>
+            <h2 style="font-size:1rem; margin-bottom:15px">📊 Operasyonel Detaylar</h2>
+            <div class="sc-grid">
+                <div class="sc-box"><span>GÖREV</span><strong id="m-g">0</strong></div>
+                <div class="sc-box"><span>PARÇA</span><strong id="m-p">0</strong></div>
+                <div class="sc-box"><span>TOPLAMA</span><strong id="m-t">0</strong></div>
+                <div class="sc-box"><span>DEVİR</span><strong id="m-d" style="color:var(--danger)">0</strong></div>
             </div>
-            <div class="progress-container"><div class="progress-bar" id="bar-task"></div></div>
-            <div id="target-msg" style="font-size:0.85rem; line-height:1.5; color:var(--accent-dark); font-weight:700">Hedef ayarlarını kontrol et!</div>
-            <button class="btn btn-wa" style="margin-top:20px" onclick="shareMonthly()">📲 TÜM AYIN RAPORUNU GÖNDER</button>
+            <button class="btn btn-wa" onclick="shareMonthly()">📲 TOPLU RAPORU PAYLAŞ</button>
         </div>
-
-        <h2 class="section-title" style="margin-left:10px">📅 Günlük Detaylar</h2>
+        <h2 style="font-size:1rem; margin:15px 0 10px 10px; font-weight:850">📅 Günlük Detaylar</h2>
         <div id="monthly-cards"></div>
     </div>
 
     <div id="p4" class="page">
         <div class="card">
-            <h2 class="section-title">⚙️ Ayarlar</h2>
-            <div class="input-group" style="margin-bottom:15px"><label>💰 Paket Başı Ücret (₺)</label><input type="number" id="cfg-ucret" onchange="updateCfg()"></div>
-            <div class="input-group"><label>📦 Aylık Hedef Kargo</label><input type="number" id="cfg-hedef" onchange="updateCfg()"></div>
+            <h2>⚙️ Ayarlar</h2>
+            <div class="input-group"><label>💰 Paket Başı Ücret (₺)</label><input type="number" id="cfg-ucret" onchange="updateCfg()"></div>
         </div>
     </div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('kurye_v21_db')) || [];
-    let config = JSON.parse(localStorage.getItem('kurye_v21_cfg')) || { ucret: 35, hedef: 0 };
+    let db = JSON.parse(localStorage.getItem('kurye_v22_db')) || [];
+    let config = JSON.parse(localStorage.getItem('kurye_v22_cfg')) || { ucret: 30 };
     
     document.getElementById('tarih').valueAsDate = new Date();
     document.getElementById('cfg-ucret').value = config.ucret;
-    document.getElementById('cfg-hedef').value = config.hedef;
 
     function showPage(num, btn) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -151,8 +131,7 @@
 
     function updateCfg() {
         config.ucret = parseFloat(document.getElementById('cfg-ucret').value) || 0;
-        config.hedef = parseFloat(document.getElementById('cfg-hedef').value) || 0;
-        localStorage.setItem('kurye_v21_cfg', JSON.stringify(config));
+        localStorage.setItem('kurye_v22_cfg', JSON.stringify(config));
     }
 
     function saveData() {
@@ -162,70 +141,58 @@
             gorev: d('gorev'), devir: d('devir'), parca: d('parca'), toplama: d('toplama'), km: d('km')
         };
         db.unshift(entry);
-        localStorage.setItem('kurye_v21_db', JSON.stringify(db));
+        localStorage.setItem('kurye_v22_db', JSON.stringify(db));
         alert("✅ Veri Kaydedildi!");
     }
 
     function renderHistory() {
         const cont = document.getElementById('history-container');
-        cont.innerHTML = db.length === 0 ? '<div style="text-align:center; padding:50px; color:#64748b;">Kayıt yok.</div>' : 
-        db.map((x, i) => {
-            const netG = x.gorev - x.devir;
-            return `
-                <div class="smart-card">
-                    <div class="sc-header">
-                        <span class="sc-date">📅 ${x.tarih.split('-').reverse().join('.')}</span>
-                        <div style="display:flex; gap:15px">
-                            <span onclick="shareDaily(${i})" style="cursor:pointer; font-size:1.4rem">📤</span>
-                            <span onclick="db.splice(${i},1); localStorage.setItem('kurye_v21_db', JSON.stringify(db)); renderHistory();" style="color:var(--danger); cursor:pointer; font-size:1.4rem">🗑️</span>
-                        </div>
-                    </div>
-                    <div class="sc-grid">
-                        <div class="sc-box"><span>GÖREV</span><strong>${x.gorev}</strong></div>
-                        <div class="sc-box"><span>DEVİR</span><strong>${x.devir}</strong></div>
-                        <div class="sc-box"><span>NET</span><strong>${netG}</strong></div>
-                        <div class="sc-box"><span>KM</span><strong>${x.km}</strong></div>
-                    </div>
-                    <div class="sc-footer">
-                        <span class="net-badge">🏆 NET TESLİMAT: ${netG}</span>
-                        <span class="price-badge">${(netG * config.ucret).toLocaleString()} ₺</span>
+        cont.innerHTML = db.map((x, i) => `
+            <div class="smart-card">
+                <div class="sc-header">
+                    <strong>📅 ${x.tarih.split('-').reverse().join('.')}</strong>
+                    <div style="display:flex; gap:15px">
+                        <span onclick="shareDaily(${i})" style="cursor:pointer; font-size:1.4rem">📤</span>
+                        <span onclick="db.splice(${i},1); localStorage.setItem('kurye_v22_db', JSON.stringify(db)); renderHistory();" style="color:var(--danger); cursor:pointer; font-size:1.4rem">🗑️</span>
                     </div>
                 </div>
-            `;
-        }).join('');
+                <div class="sc-grid">
+                    <div class="sc-box"><span>GÖREV</span><strong>${x.gorev}</strong></div>
+                    <div class="sc-box"><span>DEVİR</span><strong>${x.devir}</strong></div>
+                    <div class="sc-box"><span>TOPLAMA</span><strong>${x.toplama}</strong></div>
+                    <div class="sc-box"><span>KM</span><strong>${x.km}</strong></div>
+                </div>
+                <div class="sc-footer">
+                    <span class="net-badge">🏆 NET: ${x.gorev - x.devir} G / ${x.parca - x.devir} P</span>
+                    <span style="font-weight:900; color:var(--success)">${(x.gorev - x.devir) * config.ucret} ₺</span>
+                </div>
+            </div>
+        `).join('');
     }
 
     function renderMonthly() {
         const now = new Date();
         const m = db.filter(x => new Date(x.tarih).getMonth() === now.getMonth());
-        let g=0, d=0, p=0;
-        m.forEach(x => { g+=x.gorev; d+=x.devir; p+=x.parca; });
+        let g=0, d=0, p=0, t=0;
+        m.forEach(x => { g+=x.gorev; d+=x.devir; p+=x.parca; t+=x.toplama; });
         
-        const netG = g-d;
-        document.getElementById('rep-net-display').innerText = `${netG} G / ${p-d} P`;
-        document.getElementById('rep-income-total').innerText = (netG * config.ucret).toLocaleString() + " ₺ Saf Kazanç";
-        document.getElementById('prog-cur').innerText = netG;
-        document.getElementById('prog-target').innerText = config.hedef;
-
-        if(config.hedef > 0) {
-            const perc = Math.min((netG / config.hedef) * 100, 100);
-            document.getElementById('bar-task').style.width = perc + "%";
-            const aySonu = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-            const kalanGun = Math.max(aySonu - now.getDate(), 1);
-            const gunluk = Math.ceil((config.hedef - netG) / kalanGun);
-            document.getElementById('target-msg').innerText = `📍 Hedef için günde ortalama ${gunluk > 0 ? gunluk : 0} net kargo atmalısın.`;
-        }
+        document.getElementById('rep-net-display').innerText = `${g-d} G / ${p-d} P`;
+        document.getElementById('rep-income-total').innerText = ((g-d) * config.ucret).toLocaleString() + " ₺";
+        document.getElementById('m-g').innerText = g;
+        document.getElementById('m-p').innerText = p;
+        document.getElementById('m-t').innerText = t;
+        document.getElementById('m-d').innerText = d;
 
         const cards = document.getElementById('monthly-cards');
         cards.innerHTML = m.map(x => `
             <div class="smart-card" style="padding:15px">
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px">
-                    <strong style="font-size:0.85rem">📅 ${x.tarih.split('-').reverse().join('.')}</strong>
-                    <span onclick="shareDailyRaw('${x.tarih}')" style="cursor:pointer">📤</span>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+                    <strong style="font-size:0.9rem">📅 ${x.tarih.split('-').reverse().join('.')}</strong>
+                    <span onclick="shareDailyByDate('${x.tarih}')" style="cursor:pointer">📤</span>
                 </div>
                 <div class="sc-grid" style="margin-bottom:0">
-                    <div class="sc-box"><span>NET</span><strong>${x.gorev-x.devir}</strong></div>
-                    <div class="sc-box"><span>GÖREV</span><strong>${x.gorev}</strong></div>
+                    <div class="sc-box"><span>NET G.</span><strong>${x.gorev-x.devir}</strong></div>
+                    <div class="sc-box"><span>NET P.</span><strong>${x.parca-x.devir}</strong></div>
                     <div class="sc-box"><span>DEVİR</span><strong>${x.devir}</strong></div>
                     <div class="sc-box"><span>KM</span><strong>${x.km}</strong></div>
                 </div>
@@ -235,23 +202,37 @@
 
     function shareDaily(i) {
         const x = db[i];
-        const n = x.gorev - x.devir;
-        const text = `🚀 *GÜNLÜK ÖZET (${x.tarih.split('-').reverse().join('.')})*\n---\n🏆 *NET: ${n} ADET*\n📦 Görev: ${x.gorev}\n🔄 Devir: ${x.devir}\n📥 Toplama: ${x.toplama}\n🛣️ KM: ${x.km}\n💰 Kazanç: ${n * config.ucret} ₺`;
+        const nG = x.gorev - x.devir;
+        const nP = x.parca - x.devir;
+        const nT = x.toplama - x.devir; // Toplamadan devir düşülmüş net toplama
+
+        const text = `🚀 *GÜNLÜK ÖZET (${x.tarih.split('-').reverse().join('.')})*\n` +
+                      `-----\n` +
+                      `📦 Görev: ${x.gorev}\n` +
+                      `🔄 Devir: ${x.devir}\n` +
+                      `📥 Toplama: ${x.toplama}\n` +
+                      `🛣️ KM: ${x.km}\n` +
+                      `💰 Kazanç: ${nG * config.ucret} ₺\n` +
+                      `------\n` +
+                      `✅ *NET TESLİMATLAR:*\n\n` +
+                      `• Net Görev Sayısı: ${nG}\n` +
+                      `• Net Parça Sayısı: ${nP}\n` +
+                      `• Net Toplama Sayısı: ${Math.max(0, nT)}`;
+        
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    }
+
+    function shareDailyByDate(t) {
+        const idx = db.findIndex(v => v.tarih === t);
+        if(idx !== -1) shareDaily(idx);
     }
 
     function shareMonthly() {
-        const text = `📊 *AYLIK OPERASYON RAPORU*\n---\n🏆 TOPLAM NET: ${document.getElementById('rep-net-display').innerText}\n💰 KAZANÇ: ${document.getElementById('rep-income-total').innerText}\n🎯 HEDEF: ${document.getElementById('prog-cur').innerText} / ${document.getElementById('prog-target').innerText}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
-    }
-
-    function shareDailyRaw(tarih) {
-        const x = db.find(v => v.tarih === tarih);
-        const n = x.gorev - x.devir;
-        const text = `🚀 *GÜNLÜK RAPOR (${x.tarih.split('-').reverse().join('.')})*\n---\n🏆 *NET: ${n}*\n📦 Brüt: ${x.gorev}\n🔄 Devir: ${x.devir}`;
+        const netG = document.getElementById('m-g').innerText - document.getElementById('m-d').innerText;
+        const netP = document.getElementById('m-p').innerText - document.getElementById('m-d').innerText;
+        const text = `📊 *AYLIK OPERASYON RAPORU*\n---\n🏆 TOPLAM NET GÖREV: ${netG}\n📦 TOPLAM NET PARÇA: ${netP}\n🔄 TOPLAM DEVİR: ${document.getElementById('m-d').innerText}\n💰 TOPLAM KAZANÇ: ${document.getElementById('rep-income-total').innerText}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
     }
 </script>
-
 </body>
 </html>

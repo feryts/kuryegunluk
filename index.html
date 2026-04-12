@@ -44,6 +44,7 @@
         .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
         .btn-save { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
         .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-secondary); font-size: 0.95rem; }
+        .btn-wa-big { background: var(--whatsapp); color: white; margin-top: 20px; }
 
         .smart-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); }
         .sc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 10px; }
@@ -113,7 +114,7 @@
 
     <div id="p3" class="page">
         <div class="card">
-            <h2>Bu Ayın Finansal Özeti</h2>
+            <h2>Finansal Özet (Bu Ay)</h2>
             <div class="stat-grid">
                 <div class="stat-item full-width" style="background:#f0fdf4; border-color:#86efac;">
                     <label>Aylık Toplam Gelir</label>
@@ -127,14 +128,19 @@
         </div>
 
         <div class="card">
-            <h2>Bu Ayın İş Performansı</h2>
+            <h2>İş Performansı (Bu Ay)</h2>
             <div class="stat-grid">
                 <div class="stat-item"><label>Toplam Görev</label><span id="mon-gorev" class="stat-val">0</span></div>
                 <div class="stat-item"><label>Toplam Parça</label><span id="mon-parca" class="stat-val">0</span></div>
                 <div class="stat-item"><label>Toplama</label><span id="mon-toplama" class="stat-val">0</span></div>
                 <div class="stat-item"><label>Devir</label><span id="mon-devir" class="stat-val" style="color:var(--warning);">0</span></div>
-                <div class="stat-item full-width"><label>Toplam KM</label><span id="mon-km" class="stat-val" style="color:var(--text-primary);">0</span></div>
+                <div class="stat-item full-width" style="background:var(--accent-light); border-color:var(--accent-color);">
+                    <label>🏆 NET TESLİMAT</label>
+                    <span id="mon-net" class="stat-val" style="font-size:1.1rem;">0 Görev / 0 Parça</span>
+                </div>
+                <div class="stat-item full-width"><label>Toplam Mesafe</label><span id="mon-km" class="stat-val" style="color:var(--text-primary); font-size:1.1rem;">0 KM</span></div>
             </div>
+            <button class="btn btn-wa-big" onclick="shareMonthlyReport()">📊 Aylık Raporu WhatsApp'la Paylaş</button>
         </div>
 
         <div class="card">
@@ -177,7 +183,7 @@
             gorev: gorevSayisi,
             parca: parcaSayisi,
             devir: devirSayisi,
-            gelir: netGorevForIncome * 30, // Sabit 30 TL çarpan
+            gelir: netGorevForIncome * 30,
             toplama: parseInt(document.getElementById('toplama').value) || 0,
             km: parseInt(document.getElementById('km').value) || 0,
             gider: parseFloat(document.getElementById('gider').value) || 0
@@ -232,7 +238,7 @@
                     <div class="sc-header">
                         <div class="sc-date">📅 ${tarihFormat}</div>
                         <div class="sc-actions">
-                            <button class="btn-del" onclick="deleteEntry('${x.tarih}')" title="Sil">🗑️</button>
+                            <button class="btn-del" onclick="deleteEntry('${x.tarih}')">🗑️</button>
                             <button class="sc-wa-btn" onclick="shareDayCard('${x.tarih}')">Gönder</button>
                         </div>
                     </div>
@@ -249,7 +255,6 @@
                         <span class="sc-income">💰 Gelir: ${x.gelir} ₺</span>
                         <span class="sc-expense">📉 Gider: ${x.gider} ₺</span>
                     </div>
-                    ${x.km > 0 ? `<div style="text-align:center; font-size:0.8rem; color:#64748b; margin-top:10px;">🛣️ Mesafe: ${x.km} KM</div>` : ''}
                 </div>
             `;
             container.innerHTML += cardHTML;
@@ -272,25 +277,57 @@
             }
         });
         
+        const netG = Math.max(0, sGorev - sDevir);
+        const netP = Math.max(0, sParca - sDevir);
+
         document.getElementById('mon-gorev').innerText = sGorev;
         document.getElementById('mon-parca').innerText = sParca;
         document.getElementById('mon-toplama').innerText = sToplama;
         document.getElementById('mon-devir').innerText = sDevir;
-        document.getElementById('mon-km').innerText = sKm;
+        document.getElementById('mon-km').innerText = sKm + " KM";
         document.getElementById('mon-gelir').innerText = sGelir.toLocaleString() + " ₺";
         document.getElementById('mon-gider').innerText = sGider.toLocaleString() + " ₺";
+        document.getElementById('mon-net').innerText = `${netG} Görev / ${netP} Parça`;
     }
 
     function shareDayCard(tarih) {
         const veri = db.find(x => x.tarih === tarih);
         if(!veri) return;
         const tarihFormat = veri.tarih.split('-').reverse().join('.');
-        const netGorev = Math.max(0, veri.gorev - veri.devir);
-        const netParca = Math.max(0, veri.parca - veri.devir);
-        const mesaj = `🚀 *Kurye Operasyon Özeti* (${tarihFormat})\n\n` +
+        const netG = Math.max(0, veri.gorev - veri.devir);
+        const netP = Math.max(0, veri.parca - veri.devir);
+        const mesaj = `🚀 *Kurye Günlük Özet* (${tarihFormat})\n\n` +
                       `✅ Görev: ${veri.gorev}\n📦 Parça: ${veri.parca}\n📥 Toplama: ${veri.toplama}\n🔄 Devir: ${veri.devir}\n🛣️ KM: ${veri.km}\n\n` +
-                      `🏆 *NET:* ${netGorev} Görev / ${netParca} Parça\n\n` +
+                      `🏆 *NET:* ${netG} Görev / ${netP} Parça\n\n` +
                       `💰 *Gelir:* ${veri.gelir} ₺\n📉 *Gider:* ${veri.gider} ₺`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(mesaj)}`, '_blank');
+    }
+
+    function shareMonthlyReport() {
+        const now = new Date();
+        const ayIsmi = now.toLocaleString('tr-TR', { month: 'long', year: 'numeric' });
+        
+        const sGorev = document.getElementById('mon-gorev').innerText;
+        const sParca = document.getElementById('mon-parca').innerText;
+        const sToplama = document.getElementById('mon-toplama').innerText;
+        const sDevir = document.getElementById('mon-devir').innerText;
+        const sNet = document.getElementById('mon-net').innerText;
+        const sKm = document.getElementById('mon-km').innerText;
+        const sGelir = document.getElementById('mon-gelir').innerText;
+        const sGider = document.getElementById('mon-gider').innerText;
+
+        const mesaj = `📊 *${ayIsmi.toUpperCase()} OPERASYON RAPORU*\n\n` +
+                      `📈 *İş Hacmi*\n` +
+                      `• Toplam Görev: ${sGorev}\n` +
+                      `• Toplam Parça: ${sParca}\n` +
+                      `• Toplam Toplama: ${sToplama}\n` +
+                      `• Toplam Devir: ${sDevir}\n\n` +
+                      `🏆 *NET TESLİMAT:* ${sNet}\n\n` +
+                      `💰 *Finansal Özet*\n` +
+                      `• Toplam Gelir: ${sGelir}\n` +
+                      `• Toplam Gider: ${sGider}\n\n` +
+                      `🛣️ *Toplam Mesafe:* ${sKm}`;
+        
         window.open(`https://wa.me/?text=${encodeURIComponent(mesaj)}`, '_blank');
     }
 

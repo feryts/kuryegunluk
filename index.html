@@ -91,9 +91,9 @@
             <div class="grid-input">
                 <div class="input-box full-width"><label>Tarih</label><input type="date" id="tarih"></div>
                 <div class="input-box"><label>Görev Sayısı</label><input type="number" id="gorev" placeholder="0"></div>
-                <div class="input-box"><label>Devir</label><input type="number" id="devir" placeholder="0"></div>
                 <div class="input-box"><label>Parça Sayısı</label><input type="number" id="parca" placeholder="0"></div>
                 <div class="input-box"><label>Toplama</label><input type="number" id="toplama" placeholder="0"></div>
+                <div class="input-box"><label>Devir</label><input type="number" id="devir" placeholder="0"></div>
                 <div class="input-box"><label>Günlük KM</label><input type="number" id="km" placeholder="0"></div>
                 <div class="input-box"><label>Günlük Gider (₺)</label><input type="number" id="gider" placeholder="0"></div>
             </div>
@@ -188,7 +188,7 @@
         localStorage.setItem('kuryegunluk_data_pro', JSON.stringify(db));
         
         // Inputları temizle
-        ['gorev', 'parca', 'devir', 'toplama', 'km', 'gider'].forEach(id => { document.getElementById(id).value = ''; });
+        ['gorev', 'parca', 'toplama', 'devir', 'km', 'gider'].forEach(id => { document.getElementById(id).value = ''; });
         
         alert("Operasyon ve finans verisi başarıyla kaydedildi!");
     }
@@ -221,8 +221,8 @@
                     <div class="sc-body">
                         <div class="sc-stat"><span>Görev</span><strong>${x.gorev}</strong></div>
                         <div class="sc-stat"><span>Parça</span><strong>${x.parca}</strong></div>
-                        <div class="sc-stat"><span>Devir</span><strong>${x.devir}</strong></div>
                         <div class="sc-stat"><span>Toplama</span><strong>${x.toplama}</strong></div>
+                        <div class="sc-stat"><span>Devir</span><strong>${x.devir}</strong></div>
                     </div>
                     <div class="sc-finance">
                         <span class="sc-income">💰 Gelir: ${x.gelir} ₺</span>
@@ -266,8 +266,8 @@
         const mesaj = `🚀 *Kurye Operasyon Özeti* (${tarihFormat})\n\n` +
                       `✅ Görev: ${veri.gorev}\n` +
                       `📦 Parça: ${veri.parca}\n` +
-                      `🔄 Devir: ${veri.devir}\n` +
                       `📥 Toplama: ${veri.toplama}\n` +
+                      `🔄 Devir: ${veri.devir}\n` +
                       `🛣️ Mesafe: ${veri.km} KM\n\n` +
                       `💰 *Günlük Kazanç:* ${veri.gelir} ₺\n` +
                       `📉 *Günlük Gider:* ${veri.gider} ₺`;

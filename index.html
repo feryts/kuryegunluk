@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kurye PRO v22 - Tam Detaylı Rapor</title>
+    <title>Kurye PRO v24 - İkonlu Rapor</title>
     <style>
         :root {
             --bg-color: #f1f5f9;
@@ -11,114 +11,107 @@
             --accent-color: #2563eb;
             --text-primary: #0f172a;
             --text-secondary: #64748b;
-            --border: #e2e8f0;
             --success: #10b981;
             --danger: #ef4444;
             --whatsapp: #25d366;
+            --border: #e2e8f0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-primary); padding: 12px; padding-bottom: 50px; }
         .container { max-width: 480px; margin: 0 auto; }
 
-        /* Navigasyon */
         .nav-bar { display: flex; background: var(--card-bg); border-radius: 25px; padding: 8px; margin-bottom: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); gap: 5px; position: sticky; top: 10px; z-index: 1000; }
         .nav-btn { flex: 1; padding: 10px 2px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 10px; cursor: pointer; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-btn i { font-size: 1.3rem; font-style: normal; }
         .nav-btn.active { background: var(--accent-color); color: white; }
 
         .page { display: none; animation: slideUp 0.3s ease; }
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Kartlar */
         .card { background: var(--card-bg); border-radius: 28px; padding: 22px; border: 1px solid var(--border); margin-bottom: 15px; }
-        .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
         .input-group label { font-size: 0.7rem; font-weight: 800; color: var(--accent-color); text-transform: uppercase; margin-left: 4px; }
         input { background: #f8fafc; border: 2px solid #f1f5f9; padding: 14px; border-radius: 16px; font-size: 1rem; font-weight: 700; outline: none; width: 100%; }
-        .full-width { grid-column: span 2; }
 
-        /* Akıllı Kart v22 */
+        .progress-container { width: 100%; height: 14px; background: #e2e8f0; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); width: 0%; transition: width 0.5s ease; }
+
         .smart-card { background: white; border-radius: 28px; padding: 18px; margin-bottom: 15px; border: 1px solid var(--border); }
-        .sc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 10px; }
         .sc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
-        .sc-box { background: #f8fafc; padding: 10px 2px; border-radius: 16px; text-align: center; border: 1px solid #f1f5f9; }
+        .sc-box { background: #f8fafc; padding: 10px 2px; border-radius: 16px; text-align: center; }
         .sc-box span { font-size: 0.6rem; color: var(--text-secondary); font-weight: 800; display: block; }
         .sc-box strong { font-size: 0.9rem; }
-        
-        .sc-footer { background: #eff6ff; padding: 15px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .net-badge { font-weight: 900; color: var(--accent-color); font-size: 0.85rem; }
 
-        /* Rapor */
         .report-hero { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border-radius: 35px; padding: 30px 20px; text-align: center; margin-bottom: 20px; }
         
         .btn { width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
         .btn-save { background: var(--accent-color); color: white; }
-        .btn-wa { background: var(--whatsapp); color: white; margin-top: 15px; }
+        .btn-wa { background: var(--whatsapp); color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="nav-bar">
-        <button class="nav-btn active" onclick="showPage(1, this)"><i>📥</i>GİRİŞ</button>
-        <button class="nav-btn" onclick="showPage(2, this)"><i>📜</i>GEÇMİŞ</button>
-        <button class="nav-btn" onclick="showPage(3, this)"><i>📊</i>RAPOR</button>
-        <button class="nav-btn" onclick="showPage(4, this)"><i>⚙️</i>AYARLAR</button>
+        <button class="nav-btn active" onclick="showPage(1, this)">📥 GİRİŞ</button>
+        <button class="nav-btn" onclick="showPage(2, this)">📜 GEÇMİŞ</button>
+        <button class="nav-btn" onclick="showPage(3, this)">📊 RAPOR</button>
+        <button class="nav-btn" onclick="showPage(4, this)">⚙️ AYARLAR</button>
     </div>
 
     <div id="p1" class="page active">
         <div class="card">
-            <h2 style="font-size:1.1rem; font-weight:850; margin-bottom:15px">🚀 Kayıt Ekle</h2>
-            <div class="grid-input">
-                <div class="input-group full-width"><label>📅 Tarih</label><input type="date" id="tarih"></div>
-                <div class="input-group"><label>📦 Görev</label><input type="number" id="gorev" inputmode="numeric" placeholder="0"></div>
-                <div class="input-group"><label>🎁 Parça</label><input type="number" id="parca" inputmode="numeric" placeholder="0"></div>
-                <div class="input-group"><label>📥 Toplama</label><input type="number" id="toplama" inputmode="numeric" placeholder="0"></div>
-                <div class="input-group"><label>🔄 Devir</label><input type="number" id="devir" inputmode="numeric" placeholder="0"></div>
-                <div class="input-group full-width"><label>🛣️ Mesafe (KM)</label><input type="number" id="km" inputmode="numeric" placeholder="0"></div>
+            <h2 style="font-size:1.1rem; font-weight:850; margin-bottom:15px">🚀 Günlük Kayıt</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+                <div class="input-group" style="grid-column: span 2;"><label>📅 Tarih</label><input type="date" id="tarih"></div>
+                <div class="input-group"><label>📦 Görev</label><input type="number" id="gorev" placeholder="0"></div>
+                <div class="input-group"><label>🔄 Devir</label><input type="number" id="devir" placeholder="0"></div>
+                <div class="input-group"><label>🎁 Parça</label><input type="number" id="parca" placeholder="0"></div>
+                <div class="input-group"><label>📥 Toplama</label><input type="number" id="toplama" placeholder="0"></div>
             </div>
-            <button class="btn btn-save" style="margin-top:20px" onclick="saveData()">SİSTEME KAYDET</button>
+            <button class="btn btn-save" style="margin-top:20px" onclick="saveData()">SİSTEME İŞLE</button>
         </div>
     </div>
 
-    <div id="p2" class="page"><div id="history-container"></div></div>
-
     <div id="p3" class="page">
         <div class="report-hero">
-            <span style="font-size:0.8rem; font-weight:800; opacity:0.9">BU AYIN TOPLAMI</span>
-            <div style="font-size:2.3rem; font-weight:950; margin:5px 0" id="rep-net-display">0 G / 0 P</div>
-            <div id="rep-income-total" style="font-size:1.1rem; font-weight:700; background:rgba(255,255,255,0.2); display:inline-block; padding:5px 15px; border-radius:12px">0 ₺</div>
+            <span style="font-size:0.8rem; font-weight:700; opacity:0.9">BU AYIN KAZANCI</span>
+            <div style="font-size:2.5rem; font-weight:950; margin:5px 0" id="rep-income-total">0 ₺</div>
+            <span style="font-size:0.9rem; opacity:0.8" id="rep-net-display">0 G / 0 P</span>
         </div>
+
         <div class="card">
-            <h2 style="font-size:1rem; margin-bottom:15px">📊 Operasyonel Detaylar</h2>
-            <div class="sc-grid">
-                <div class="sc-box"><span>GÖREV</span><strong id="m-g">0</strong></div>
-                <div class="sc-box"><span>PARÇA</span><strong id="m-p">0</strong></div>
-                <div class="sc-box"><span>TOPLAMA</span><strong id="m-t">0</strong></div>
-                <div class="sc-box"><span>DEVİR</span><strong id="m-d" style="color:var(--danger)">0</strong></div>
+            <h2 style="font-size:1rem; font-weight:850; margin-bottom:10px">🎯 Aylık Hedef Durumu</h2>
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:800; color:var(--text-secondary)">
+                <span id="prog-txt-left">0 Adet</span>
+                <span id="prog-txt-right">Hedef: 0</span>
             </div>
+            <div class="progress-container"><div class="progress-bar" id="bar-task"></div></div>
             <button class="btn btn-wa" onclick="shareMonthly()">📲 TOPLU RAPORU PAYLAŞ</button>
         </div>
-        <h2 style="font-size:1rem; margin:15px 0 10px 10px; font-weight:850">📅 Günlük Detaylar</h2>
+
         <div id="monthly-cards"></div>
     </div>
 
     <div id="p4" class="page">
         <div class="card">
-            <h2>⚙️ Ayarlar</h2>
+            <h2 style="font-size:1.1rem; font-weight:850; margin-bottom:15px">⚙️ Ayarlar</h2>
             <div class="input-group"><label>💰 Paket Başı Ücret (₺)</label><input type="number" id="cfg-ucret" onchange="updateCfg()"></div>
+            <div class="input-group"><label>📦 Aylık Hedef (Adet)</label><input type="number" id="cfg-hedef" onchange="updateCfg()"></div>
         </div>
     </div>
+
+    <div id="p2" class="page"><div id="history-container"></div></div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('kurye_v22_db')) || [];
-    let config = JSON.parse(localStorage.getItem('kurye_v22_cfg')) || { ucret: 30 };
+    let db = JSON.parse(localStorage.getItem('kurye_v24_db')) || [];
+    let config = JSON.parse(localStorage.getItem('kurye_v24_cfg')) || { ucret: 35, hedef: 0 };
     
     document.getElementById('tarih').valueAsDate = new Date();
     document.getElementById('cfg-ucret').value = config.ucret;
+    document.getElementById('cfg-hedef').value = config.hedef;
 
     function showPage(num, btn) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -131,17 +124,18 @@
 
     function updateCfg() {
         config.ucret = parseFloat(document.getElementById('cfg-ucret').value) || 0;
-        localStorage.setItem('kurye_v22_cfg', JSON.stringify(config));
+        config.hedef = parseFloat(document.getElementById('cfg-hedef').value) || 0;
+        localStorage.setItem('kurye_v24_cfg', JSON.stringify(config));
     }
 
     function saveData() {
         const d = (id) => parseFloat(document.getElementById(id).value) || 0;
         const entry = {
             tarih: document.getElementById('tarih').value,
-            gorev: d('gorev'), devir: d('devir'), parca: d('parca'), toplama: d('toplama'), km: d('km')
+            gorev: d('gorev'), devir: d('devir'), parca: d('parca'), toplama: d('toplama')
         };
         db.unshift(entry);
-        localStorage.setItem('kurye_v22_db', JSON.stringify(db));
+        localStorage.setItem('kurye_v24_db', JSON.stringify(db));
         alert("✅ Veri Kaydedildi!");
     }
 
@@ -149,22 +143,18 @@
         const cont = document.getElementById('history-container');
         cont.innerHTML = db.map((x, i) => `
             <div class="smart-card">
-                <div class="sc-header">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px">
                     <strong>📅 ${x.tarih.split('-').reverse().join('.')}</strong>
                     <div style="display:flex; gap:15px">
-                        <span onclick="shareDaily(${i})" style="cursor:pointer; font-size:1.4rem">📤</span>
-                        <span onclick="db.splice(${i},1); localStorage.setItem('kurye_v22_db', JSON.stringify(db)); renderHistory();" style="color:var(--danger); cursor:pointer; font-size:1.4rem">🗑️</span>
+                        <span onclick="shareDaily(${i})" style="font-size:1.4rem; cursor:pointer">📤</span>
+                        <span onclick="db.splice(${i},1); localStorage.setItem('kurye_v24_db', JSON.stringify(db)); renderHistory();" style="color:var(--danger); cursor:pointer">🗑️</span>
                     </div>
                 </div>
                 <div class="sc-grid">
-                    <div class="sc-box"><span>GÖREV</span><strong>${x.gorev}</strong></div>
-                    <div class="sc-box"><span>DEVİR</span><strong>${x.devir}</strong></div>
+                    <div class="sc-box"><span>NET G.</span><strong>${x.gorev - x.devir}</strong></div>
+                    <div class="sc-box"><span>NET P.</span><strong>${x.parca - x.devir}</strong></div>
                     <div class="sc-box"><span>TOPLAMA</span><strong>${x.toplama}</strong></div>
-                    <div class="sc-box"><span>KM</span><strong>${x.km}</strong></div>
-                </div>
-                <div class="sc-footer">
-                    <span class="net-badge">🏆 NET: ${x.gorev - x.devir} G / ${x.parca - x.devir} P</span>
-                    <span style="font-weight:900; color:var(--success)">${(x.gorev - x.devir) * config.ucret} ₺</span>
+                    <div class="sc-box"><span>KAZANÇ</span><strong>${(x.gorev - x.devir)*config.ucret}₺</strong></div>
                 </div>
             </div>
         `).join('');
@@ -176,61 +166,63 @@
         let g=0, d=0, p=0, t=0;
         m.forEach(x => { g+=x.gorev; d+=x.devir; p+=x.parca; t+=x.toplama; });
         
-        document.getElementById('rep-net-display').innerText = `${g-d} G / ${p-d} P`;
-        document.getElementById('rep-income-total').innerText = ((g-d) * config.ucret).toLocaleString() + " ₺";
-        document.getElementById('m-g').innerText = g;
-        document.getElementById('m-p').innerText = p;
-        document.getElementById('m-t').innerText = t;
-        document.getElementById('m-d').innerText = d;
+        const currentNet = g-d;
+        document.getElementById('rep-income-total').innerText = (currentNet * config.ucret).toLocaleString() + " ₺";
+        document.getElementById('rep-net-display').innerText = `${currentNet} G / ${p-d} P`;
+        document.getElementById('prog-txt-left').innerText = currentNet + " Adet";
+        document.getElementById('prog-txt-right').innerText = "Hedef: " + config.hedef;
 
-        const cards = document.getElementById('monthly-cards');
-        cards.innerHTML = m.map(x => `
-            <div class="smart-card" style="padding:15px">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-                    <strong style="font-size:0.9rem">📅 ${x.tarih.split('-').reverse().join('.')}</strong>
-                    <span onclick="shareDailyByDate('${x.tarih}')" style="cursor:pointer">📤</span>
-                </div>
-                <div class="sc-grid" style="margin-bottom:0">
-                    <div class="sc-box"><span>NET G.</span><strong>${x.gorev-x.devir}</strong></div>
-                    <div class="sc-box"><span>NET P.</span><strong>${x.parca-x.devir}</strong></div>
-                    <div class="sc-box"><span>DEVİR</span><strong>${x.devir}</strong></div>
-                    <div class="sc-box"><span>KM</span><strong>${x.km}</strong></div>
-                </div>
-            </div>
-        `).join('');
+        if(config.hedef > 0) {
+            const perc = Math.min((currentNet / config.hedef) * 100, 100);
+            document.getElementById('bar-task').style.width = perc + "%";
+        }
     }
 
     function shareDaily(i) {
         const x = db[i];
         const nG = x.gorev - x.devir;
         const nP = x.parca - x.devir;
-        const nT = x.toplama - x.devir; // Toplamadan devir düşülmüş net toplama
+        const kazanc = nG * config.ucret;
 
-        const text = `🚀 *GÜNLÜK ÖZET (${x.tarih.split('-').reverse().join('.')})*\n` +
-                      `-----\n` +
-                      `📦 Görev: ${x.gorev}\n` +
-                      `🔄 Devir: ${x.devir}\n` +
-                      `📥 Toplama: ${x.toplama}\n` +
-                      `🛣️ KM: ${x.km}\n` +
-                      `💰 Kazanç: ${nG * config.ucret} ₺\n` +
-                      `------\n` +
-                      `✅ *NET TESLİMATLAR:*\n\n` +
-                      `• Net Görev Sayısı: ${nG}\n` +
-                      `• Net Parça Sayısı: ${nP}\n` +
-                      `• Net Toplama Sayısı: ${Math.max(0, nT)}`;
+        const text = `🚀 *GÜNLÜK OPERASYON ÖZETİ* 🚀\n` +
+                      `📅 *Tarih:* ${x.tarih.split('-').reverse().join('.')}\n` +
+                      `━━━━━━━━━━━━━━━━━━\n` +
+                      `📦 *BRÜT VERİLER*\n` +
+                      `┣ 📥 Görev: ${x.gorev} Adet\n` +
+                      `┣ 🔄 Devir: ${x.devir} Adet\n` +
+                      `┗ 📤 Toplama: ${x.toplama} Adet\n` +
+                      `━━━━━━━━━━━━━━━━━━\n` +
+                      `✅ *NET TESLİMAT SONUÇLARI*\n` +
+                      `┣ 🎯 Net Görev: *${nG} Adet*\n` +
+                      `┣ 💎 Net Parça: *${nP} Adet*\n` +
+                      `┗ 🏗️ Net Toplama: *${x.toplama} Adet*\n` +
+                      `━━━━━━━━━━━━━━━━━━\n` +
+                      `💰 *FİNANSAL DURUM*\n` +
+                      `┣ 💵 Birim Ücret: ${config.ucret} ₺\n` +
+                      `┗ 🏆 *KAZANÇ: ${kazanc.toLocaleString()} ₺*\n` +
+                      `━━━━━━━━━━━━━━━━━━\n` +
+                      `🚛 _Yollarda Fiat Doblo 1.3_`;
         
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
     }
 
-    function shareDailyByDate(t) {
-        const idx = db.findIndex(v => v.tarih === t);
-        if(idx !== -1) shareDaily(idx);
-    }
-
     function shareMonthly() {
-        const netG = document.getElementById('m-g').innerText - document.getElementById('m-d').innerText;
-        const netP = document.getElementById('m-p').innerText - document.getElementById('m-d').innerText;
-        const text = `📊 *AYLIK OPERASYON RAPORU*\n---\n🏆 TOPLAM NET GÖREV: ${netG}\n📦 TOPLAM NET PARÇA: ${netP}\n🔄 TOPLAM DEVİR: ${document.getElementById('m-d').innerText}\n💰 TOPLAM KAZANÇ: ${document.getElementById('rep-income-total').innerText}`;
+        const now = new Date();
+        const m = db.filter(x => new Date(x.tarih).getMonth() === now.getMonth());
+        let g=0, d=0, p=0;
+        m.forEach(x => { g+=x.gorev; d+=x.devir; p+=x.parca; });
+        
+        const netG = g-d;
+        const text = `📊 *AYLIK GENEL RAPOR* 📊\n` +
+                      `📅 *Dönem:* ${now.toLocaleString('tr-TR', { month: 'long', year: 'numeric' })}\n` +
+                      `━━━━━━━━━━━━━━━━━━\n` +
+                      `🏆 *TOPLAM NET:* ${netG} Adet\n` +
+                      `📦 *TOPLAM PARÇA:* ${p-d} Adet\n` +
+                      `💰 *TOPLAM KAZANÇ:* ${(netG * config.ucret).toLocaleString()} ₺\n` +
+                      `━━━━━━━━━━━━━━━━━━\n` +
+                      `🎯 *HEDEF DURUMU:* %${Math.round((netG/config.hedef)*100) || 0}\n` +
+                      `🏁 ${netG} / ${config.hedef} Adet`;
+        
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
     }
 </script>

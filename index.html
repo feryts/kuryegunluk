@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kurye PRO v26</title>
+    <title>Kurye PRO v27</title>
     <style>
         :root {
             --bg-color: #f1f5f9;
@@ -71,7 +71,7 @@
                 <div class="input-group"><label>🎁 Parça</label><input type="number" id="parca" placeholder="0" inputmode="numeric"></div>
                 <div class="input-group"><label>🔄 Devir</label><input type="number" id="devir" placeholder="0" inputmode="numeric"></div>
                 <div class="input-group"><label>📥 Toplama</label><input type="number" id="toplama" placeholder="0" inputmode="numeric"></div>
-                <div class="input-group full-width"><label>🛣️ Günlük KM</label><input type="number" id="km" placeholder="0" inputmode="numeric"></div>
+                <div class="input-group" style="grid-column: span 2;"><label>🛣️ Günlük KM</label><input type="number" id="km" placeholder="0" inputmode="numeric"></div>
             </div>
             <button class="btn btn-save" style="margin-top:20px" onclick="saveData()">KAYDET</button>
         </div>
@@ -97,7 +97,6 @@
             <div id="target-detail" class="target-info"></div>
             <button class="btn btn-wa" style="margin-top:15px" onclick="shareMonthly()">📲 AYLIK ÖZETİ PAYLAŞ</button>
         </div>
-
         <h2 style="font-size:1rem; font-weight:850; margin:15px 10px">📅 Günlük Liste</h2>
         <div id="monthly-cards"></div>
     </div>
@@ -142,6 +141,9 @@
         });
         localStorage.setItem('kurye_v26_db', JSON.stringify(db));
         alert("✅ Veri Kaydedildi!");
+        
+        // Girişleri Temizle
+        ['gorev', 'parca', 'devir', 'toplama', 'km'].forEach(id => document.getElementById(id).value = '');
     }
 
     function renderHistory() {
@@ -168,38 +170,27 @@
     function renderMonthly() {
         const now = new Date();
         const m = db.filter(x => new Date(x.tarih).getMonth() === now.getMonth());
-        let g=0, d=0, p=0, t=0, km=0;
-        m.forEach(x => { g+=x.gorev; d+=x.devir; p+=x.parca; t+=x.toplama; km+=x.km; });
-        
+        let g=0, d=0, p=0, t=0;
+        m.forEach(x => { g+=x.gorev; d+=x.devir; p+=x.parca; t+=x.toplama; });
         const netG = g-d;
-        const netP = p-d;
-        document.getElementById('rep-net-display').innerText = `${netG} G / ${netP} P`;
+        document.getElementById('rep-net-display').innerText = `${netG} G / ${p-d} P`;
         document.getElementById('rep-income-total').innerText = `Kazanç: ${(netG * config.ucret).toLocaleString()} ₺`;
         document.getElementById('rep-extra-info').innerText = `Brüt: ${g} | Devir: ${d} | Toplama: ${t}`;
-        
         document.getElementById('prog-txt-left').innerText = netG + " Adet";
         document.getElementById('prog-txt-right').innerText = "Hedef: " + config.hedef;
 
         if(config.hedef > 0) {
             const perc = Math.min((netG / config.hedef) * 100, 100);
             document.getElementById('bar-task').style.width = perc + "%";
-            const targetIncome = config.hedef * config.ucret;
             const aySonu = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
             const kalanGun = Math.max(aySonu - now.getDate(), 1);
-            const kalanKargo = Math.max(config.hedef - netG, 0);
-            document.getElementById('target-detail').innerHTML = `
-                💰 Hedef Kazanç: <b>${targetIncome.toLocaleString()} ₺</b><br>
-                📉 Kalan Kargo: <b>${kalanKargo} Adet</b><br>
-                📍 Günlük Alman Gereken: <b>${Math.ceil(kalanKargo/kalanGun)} Adet</b>
-            `;
+            document.getElementById('target-detail').innerHTML = `📉 Kalan Kargo: <b>${Math.max(config.hedef - netG, 0)} Adet</b><br>📍 Günlük Alman Gereken: <b>${Math.ceil(Math.max(config.hedef - netG, 0)/kalanGun)} Adet</b>`;
         }
 
         const cards = document.getElementById('monthly-cards');
         cards.innerHTML = m.map(x => `
             <div class="smart-card">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-                    <strong>📅 ${x.tarih.split('-').reverse().join('.')}</strong>
-                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px"><strong>📅 ${x.tarih.split('-').reverse().join('.')}</strong></div>
                 <div class="sc-grid">
                     <div class="sc-box"><span>NET G.</span><strong>${x.gorev-x.devir}</strong></div>
                     <div class="sc-box"><span>NET P.</span><strong>${x.parca-x.devir}</strong></div>
@@ -213,56 +204,21 @@
     function shareDaily(i) {
         const x = db[i];
         const nG = x.gorev - x.devir;
-        const nP = x.parca - x.devir;
-        const text = `📅 *Tarih:* ${x.tarih.split('-').reverse().join('.')}\n` +
-                      `━━━━━━━━━━━━━━━━━━\n` +
-                      `📦 *BRÜT VERİLER*\n` +
-                      `┣ 📥 Görev: ${x.gorev}\n` +
-                      `┣ 🔄 Devir: ${x.devir}\n` +
-                      `┗ 📤 Toplama: ${x.toplama}\n` +
-                      `━━━━━━━━━━━━━━━━━━\n` +
-                      `✅ *NET TESLİMATLAR*\n` +
-                      `┣ 🎯 Net Görev: *${nG} Adet*\n` +
-                      `┣ 💎 Net Parça: *${nP} Adet*\n` +
-                      `┣ 🏗️ Net Toplama: *${x.toplama} Adet*\n` +
-                      `┗ 🛣️ KM: *${x.km}*\n` +
-                      `━━━━━━━━━━━━━━━━━━`;
+        const text = `📅 *Tarih:* ${x.tarih.split('-').reverse().join('.')}\n━━━━━━━━━━━━━━━━━━\n📦 *BRÜT VERİLER*\n┣ 📥 Görev: ${x.gorev}\n┣ 🔄 Devir: ${x.devir}\n┗ 📤 Toplama: ${x.toplama}\n━━━━━━━━━━━━━━━━━━\n✅ *NET TESLİMATLAR*\n┣ 🎯 Net Görev: *${nG} Adet*\n┣ 💎 Net Parça: *${x.parca - x.devir} Adet*\n┣ 🏗️ Net Toplama: *${x.toplama} Adet*\n┗ 🛣️ KM: *${x.km}*\n━━━━━━━━━━━━━━━━━━`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
     }
 
     function shareMonthly() {
-        const now = new Date();
-        const m = db.filter(x => new Date(x.tarih).getMonth() === now.getMonth());
+        const m = db.filter(x => new Date(x.tarih).getMonth() === new Date().getMonth());
         let gT=0, pT=0, tT=0, dT=0, kmT=0;
-        
         let liste = `📊 *AYLIK GENEL ÖZET* 📊\n━━━━━━━━━━━━━━━━━━\n\n`;
-        
         m.slice().reverse().forEach(x => {
             const nG = x.gorev - x.devir;
             const nP = x.parca - x.devir;
             gT += nG; pT += nP; tT += x.toplama; dT += x.devir; kmT += x.km;
-            
-            liste += `📅 *${x.tarih.split('-').reverse().join('.')}*\n` +
-                     `• Görev: ${x.gorev} | Parça: ${x.parca}\n` +
-                     `• Toplama: ${x.toplama} | Devir: ${x.devir}\n` +
-                     `• *Net Görev:* ${nG} | *Net Parça:* ${nP}\n` +
-                     `• KM: ${x.km}\n` +
-                     `──────────────────\n`;
+            liste += `📅 *${x.tarih.split('-').reverse().join('.')}*\n• Görev: ${x.gorev} | Parça: ${x.parca}\n• Toplama: ${x.toplama} | Devir: ${x.devir}\n• *Net Görev:* ${nG} | *Net Parça:* ${nP}\n• KM: ${x.km}\n──────────────────\n`;
         });
-
-        const perc = Math.round((gT / config.hedef) * 100) || 0;
-        
-        liste += `\n🏆 *GENEL TOPLAM NET*\n` +
-                 `┣ ✅ Net Görev: *${gT}*\n` +
-                 `┣ 📦 Net Parça: *${pT}*\n` +
-                 `┣ 🏗️ Net Toplama: *${tT}*\n` +
-                 `┣ 🔄 Toplam Devir: *${dT}*\n` +
-                 `┣ 🛣️ Toplam KM: *${kmT}*\n` +
-                 `━━━━━━━━━━━━━━━━━━\n` +
-                 `🎯 *HEDEF:* ${config.hedef} Adet\n` +
-                 `🏁 *İLERLEME:* %${perc}\n` +
-                 `━━━━━━━━━━━━━━━━━━`;
-
+        liste += `\n🏆 *GENEL TOPLAM NET*\n┣ ✅ Net Görev: *${gT}*\n┣ 📦 Net Parça: *${pT}*\n┣ 🏗️ Net Toplama: *${tT}*\n┣ 🔄 Toplam Devir: *${dT}*\n┣ 🛣️ Toplam KM: *${kmT}*\n━━━━━━━━━━━━━━━━━━\n🎯 *HEDEF:* ${config.hedef}\n🏁 *İLERLEME:* %${Math.round((gT/config.hedef)*100) || 0}\n━━━━━━━━━━━━━━━━━━`;
         window.open(`https://wa.me/?text=${encodeURIComponent(liste)}`);
     }
 </script>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kolay Gelsin Operasyon Paneli</title>
+    <style>
+        .page { display: none; padding: 20px; }
+        .active { display: block; }
+        nav button { padding: 10px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <button onclick="showPage('sorgulama')">🔍 Sorgulama</button>
+    <button onclick="showPage('ayristirma')">📦 Ayrıştırma</button>
+    <button onclick="showPage('moy')">🚚 MOY Takibi</button>
+    <button onclick="showPage('otp')">🔐 OTP</button>
+    <button onclick="showPage('liste')">📋 Liste</button>
+</nav>
+
+<div id="sorgulama" class="page active">
+    <input id="barcode" placeholder="Barkod No">
+    <button onclick="run('GetShipmentDetail', { Barcode: document.getElementById('barcode').value })">Sorgula</button>
+</div>
+
+<div id="ayristirma" class="page">
+    <input id="sortCode" placeholder="Ayrıştırma Kodu">
+    <button onclick="run('SortShipment', { Code: document.getElementById('sortCode').value })">İşle</button>
+</div>
+
+<div id="moy" class="page">
+    <button onclick="run('GetMOYStatus', {})">MOY Durumlarını Güncelle</button>
+</div>
+
+<div id="otp" class="page">
+    <input id="otpVal" placeholder="OTP Kodunu Gir">
+    <button onclick="run('VerifyOTP', { Code: document.getElementById('otpVal').value })">Doğrula</button>
+</div>
+
+<div id="liste" class="page">
+    <button onclick="run('GetShipments', { Page: 1 })">Listeyi Çek</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    async function run(operation, params) {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/proxy', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ payload: { "OperationName": operation, "Parameters": params }, token })
+        });
+        const data = await res.json();
+        console.log(operation + " yanıtı:", data);
+        alert(operation + " işlemi yapıldı (konsola bak).");
+    }
+</script>
+</body>
+</html>
